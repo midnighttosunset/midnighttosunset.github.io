@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krishuuupokhari</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow: hidden;
+      background: #050a14;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #crosshair {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px;
+      height: 2px;
+      background: rgba(180, 200, 230, 0.15);
+      border-radius: 50%;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    #controls-hint {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(140, 165, 200, 0.35);
+      font-family: 'Consolas', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    /* Hide Spotify behind the canvas (must stay on-screen for audio) */
+    #spotify-container,
+    #spotify-container iframe,
+    iframe[src*="spotify"] {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      width: 300px !important;
+      height: 80px !important;
+      z-index: -10 !important;
+      pointer-events: none !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="crosshair"></div>
+  <!-- Hidden Spotify embed -->
+  <div id="spotify-container"
+    style="position:fixed;left:-9999px;top:-9999px;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none;">
+  </div>
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+    // ── Config ──
+    const PW = 70, PD = 50;
+    const HW = PW / 2, HD = PD / 2;
+    const GY = 0.25, WY = -0.1;
+    const PH = 1.95; // player eye height
+    const SPD = 4.5;
+
+    // ══════════════════════════════════════════════════════════════
+    // RENDERER — performance-first settings
+    // ══════════════════════════════════════════════════════════════
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    // NO shadow maps — huge perf win
+    document.body.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a1225);
+    scene.fog = new THREE.Fog(0x0a1225, 80, 250);
+
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 400);
+    // Start inside the main pavilion
+    camera.position.set(-18, PH, -12);
+
+    const clock = new THREE.Clock();
+
+    // ══════════════════════════════════════════════════════════════
+    // CONTROLS
+    // ══════════════════════════════════════════════════════════════
+    const controls = new PointerLockControls(camera, document.body);
+    scene.add(controls.getObject());
+    const keys = {};
+    document.addEventListener('keydown', e => keys[e.code] = true);
+    document.addEventListener('keyup', e => keys[e.code] = false);
+
+    // ── Spotify music ──
+    let spotifyReady = false;
+    let spotifyController = null;
+    let musicStarted = false;
+
+    window.onSpotifyIframeApiReady = (IFrameAPI) => {
+      spotifyReady = true;
+      const el = document.getElementById('spotify-container');
+      const options = {
+        uri: 'spotify:track:2fRC0OzTLFj7XjeHxX2E6w',
+        width: 300,
+        height: 80,
+      };
+      IFrameAPI.createController(el, options, (controller) => {
+        spotifyController = controller;
+        controller.addListener('ready', () => {
+          if (musicStarted) controller.togglePlay();
+        });
+      });
+    };
+
+    function startMusic() {
+      if (musicStarted) return;
+      musicStarted = true;
+      if (spotifyController) {
+        spotifyController.togglePlay();
+      }
+    }
+
+    // Click anywhere on canvas to lock pointer + start music
+    renderer.domElement.addEventListener('click', () => {
+      if (!controls.isLocked) {
+        controls.lock();
+        startMusic();
+      }
+    });
+    controls.addEventListener('lock', () => startMusic());
+
+    // ══════════════════════════════════════════════════════════════
+    // LIGHTING — moonlit night, everything naturally visible
+    // Only 4 lights total: ambient + hemisphere + directional + 1 fill
+    // ══════════════════════════════════════════════════════════════
+
+    // Strong cool ambient — like clear moonlit night
+    scene.add(new THREE.AmbientLight(0x4a5a80, 1.8));
+
+    // Hemisphere: bright blue sky dome → dark ground
+    scene.add(new THREE.HemisphereLight(0x5570a0, 0x152030, 1.2));
+
+    // Main "moon" directional — bright, cool white
+    const moon = new THREE.DirectionalLight(0x8899cc, 1.5);
+    moon.position.set(-40, 100, -30);
+    scene.add(moon);
+
+    // Gentle fill from opposite side to reduce harsh shadows
+    const fill = new THREE.DirectionalLight(0x354060, 0.4);
+    fill.position.set(30, 40, 40);
+    scene.add(fill);
+
+    // ══════════════════════════════════════════════════════════════
+    // TEXTURES (single canvas each, reused)
+    // ══════════════════════════════════════════════════════════════
+    function makeTex(w, h, draw) {
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      draw(c.getContext('2d'), w, h);
+      const t = new THREE.CanvasTexture(c);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      return t;
+    }
+
+    const groundTex = makeTex(256, 256, (ctx, w, h) => {
+      ctx.fillStyle = '#3a2e22';
+      ctx.fillRect(0, 0, w, h);
+      for (let row = 0; row < h / 12; row++) {
+        const off = (row % 2) * 16;
+        for (let col = -1; col < w / 32 + 1; col++) {
+          const v = 48 + Math.random() * 20;
+          ctx.fillStyle = `rgb(${v},${v * 0.72 | 0},${v * 0.55 | 0})`;
+          ctx.fillRect(col * 32 + off + 1, row * 12 + 1, 30, 10);
+        }
+      }
+    });
+    groundTex.repeat.set(10, 10);
+
+    const wallTex = makeTex(128, 64, (ctx, w, h) => {
+      ctx.fillStyle = '#3d3028';
+      ctx.fillRect(0, 0, w, h);
+      for (let r = 0; r < 4; r++) {
+        const off = (r % 2) * 16;
+        for (let c = -1; c < 9; c++) {
+          const v = 50 + Math.random() * 18;
+          ctx.fillStyle = `rgb(${v},${v * 0.7 | 0},${v * 0.55 | 0})`;
+          ctx.fillRect(c * 16 + off + 1, r * 16 + 1, 14, 14);
+        }
+      }
+    });
+
+    // Single building texture, used for all
+    const bldgTex = makeTex(256, 256, (ctx, w, h) => {
+      ctx.fillStyle = '#352a20';
+      ctx.fillRect(0, 0, w, h);
+      // Brick
+      for (let row = 0; row < h / 6; row++) {
+        const off = (row % 2) * 8;
+        for (let col = -1; col < w / 16 + 2; col++) {
+          ctx.strokeStyle = 'rgba(60,45,35,0.15)';
+          ctx.strokeRect(col * 16 + off, row * 6, 16, 6);
+        }
+      }
+      // Windows — 5 floors x 4 windows
+      const flH = h / 5, gap = w / 5;
+      for (let f = 0; f < 5; f++) {
+        for (let wi = 0; wi < 4; wi++) {
+          const wx = gap * (wi + 0.5), wy = f * flH + flH * 0.25;
+          const ww = gap * 0.4, wh = flH * 0.38;
+          const lit = Math.random() < 0.25;
+          ctx.fillStyle = lit
+            ? `rgba(200,190,160,${0.2 + Math.random() * 0.15})`
+            : 'rgba(10,15,25,0.75)';
+          ctx.fillRect(wx, wy, ww, wh);
+          ctx.strokeStyle = 'rgba(60,48,35,0.3)';
+          ctx.strokeRect(wx, wy, ww, wh);
+        }
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // GROUND (plane with pond hole)
+    // ══════════════════════════════════════════════════════════════
+    const gs = new THREE.Shape();
+    const GE = 70;
+    gs.moveTo(-GE, -GE); gs.lineTo(GE, -GE); gs.lineTo(GE, GE); gs.lineTo(-GE, GE); gs.lineTo(-GE, -GE);
+    const gh = new THREE.Path();
+    gh.moveTo(-HW, -HD); gh.lineTo(-HW, HD); gh.lineTo(HW, HD); gh.lineTo(HW, -HD); gh.lineTo(-HW, -HD);
+    gs.holes.push(gh);
+    const groundMesh = new THREE.Mesh(
+      new THREE.ShapeGeometry(gs).rotateX(-Math.PI / 2),
+      new THREE.MeshLambertMaterial({ map: groundTex })
+    );
+    groundMesh.position.y = GY;
+    scene.add(groundMesh);
+
+    // ══════════════════════════════════════════════════════════════
+    // POND WALLS (4 boxes)
+    // ══════════════════════════════════════════════════════════════
+    const wMat = new THREE.MeshLambertMaterial({ map: wallTex });
+    [[0, -HD, PW + .8, .4], [0, HD, PW + .8, .4], [HW, 0, .4, PD], [-HW, 0, .4, PD]]
+      .forEach(([x, z, w, d]) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, 1, d), wMat);
+        m.position.set(x, GY + 0.5, z);
+        scene.add(m);
+      });
+
+    // ══════════════════════════════════════════════════════════════
+    // WATER — lightweight shader (reduced segments + fewer ripple loops)
+    // ══════════════════════════════════════════════════════════════
+    const wU = { u_time: { value: 0 } };
+
+    const waterMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(PW, PD, 60, 44).rotateX(-Math.PI / 2),
+      new THREE.ShaderMaterial({
+        uniforms: wU,
+        transparent: true,
+        side: THREE.DoubleSide,
+        vertexShader: `
+          uniform float u_time;
+          varying vec2 vUv;
+          varying float vW;
+          void main() {
+            vUv = uv;
+            vec3 p = position;
+            float w = sin(p.x*.25+u_time*.35)*.06 + cos(p.z*.2+u_time*.28)*.05
+                    + sin((p.x+p.z)*.12+u_time*.42)*.04
+                    + sin(p.x*.6-u_time*.22)*cos(p.z*.5+u_time*.18)*.02;
+            p.y += w;
+            vW = w;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
+          }`,
+        fragmentShader: `
+          uniform float u_time;
+          varying vec2 vUv;
+          varying float vW;
+          float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+          void main() {
+            vec3 col = vec3(0.04, 0.065, 0.12);
+            col += vec3(.01,.018,.035) * (vW*5.0+.5);
+            // 8 ripples only
+            float rip = 0.0;
+            for(int i=0;i<8;i++){
+              float fi=float(i);
+              vec2 cen = vec2(hash(vec2(fi*17.3,fi*31.7))*70.0-35.0,
+                              hash(vec2(fi*23.1,fi*47.3))*50.0-25.0);
+              float t = fract(u_time*0.3+hash(vec2(fi*7.1,fi*13.3)));
+              float dist = distance(vUv*vec2(70.0,50.0)-vec2(35.0,25.0), cen);
+              float rad = t*4.0, w2 = 0.25+t*0.15;
+              float ring = smoothstep(rad-w2,rad,dist)-smoothstep(rad,rad+w2,dist);
+              rip += ring*(1.0-t)*0.12;
+            }
+            col += vec3(.04,.06,.1)*rip;
+            // starlight sheen
+            float spec = pow(max(0.0,vW*4.0+.2),10.0)*0.05;
+            col += vec3(.45,.5,.75)*spec;
+            gl_FragColor = vec4(col, 0.9);
+          }`
+      })
+    );
+    waterMesh.position.y = WY;
+    scene.add(waterMesh);
+
+    // Dark pond bottom
+    const btm = new THREE.Mesh(
+      new THREE.PlaneGeometry(PW - 1, PD - 1).rotateX(-Math.PI / 2),
+      new THREE.MeshLambertMaterial({ color: 0x0c140c })
+    );
+    btm.position.y = -1.5;
+    scene.add(btm);
+
+    // ══════════════════════════════════════════════════════════════
+    // BUILDINGS — fewer meshes, reuse material
+    // ══════════════════════════════════════════════════════════════
+    const bMat = new THREE.MeshLambertMaterial({ map: bldgTex });
+
+    function bldg(x, z, w, d, h) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bMat);
+      m.position.set(x, GY + h / 2, z);
+      scene.add(m);
+    }
+
+    // South (8 buildings)
+    for (let i = 0; i < 8; i++) {
+      bldg(-32 + i * 9, HD + 8 + Math.random() * 3, 7 + Math.random() * 6, 6 + Math.random() * 4, 9 + Math.random() * 9);
+    }
+    // North (8)
+    for (let i = 0; i < 8; i++) {
+      bldg(-32 + i * 9, -HD - 8 - Math.random() * 3, 7 + Math.random() * 6, 6 + Math.random() * 4, 9 + Math.random() * 9);
+    }
+    // East (6)
+    for (let i = 0; i < 6; i++) {
+      bldg(HW + 8 + Math.random() * 3, -20 + i * 8, 6 + Math.random() * 4, 7 + Math.random() * 6, 9 + Math.random() * 9);
+    }
+    // West (6)
+    for (let i = 0; i < 6; i++) {
+      bldg(-HW - 8 - Math.random() * 3, -20 + i * 8, 6 + Math.random() * 4, 7 + Math.random() * 6, 9 + Math.random() * 9);
+    }
+    // Tall hotel NE
+    bldg(HW + 12, -HD - 6, 14, 10, 26);
+
+    // ══════════════════════════════════════════════════════════════
+    // PAVILION 1 (main)
+    // ══════════════════════════════════════════════════════════════
+    const pavMat = new THREE.MeshLambertMaterial({ color: 0x4a3828 });
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0x5a2818 });
+    const pilMat = new THREE.MeshLambertMaterial({ color: 0x3a2618 });
+
+    function makePavilion(x, z, s) {
+      const g = new THREE.Group();
+      // Platform
+      const plat = new THREE.Mesh(new THREE.BoxGeometry(7 * s, 1.1, 7 * s), pavMat);
+      plat.position.set(0, WY + 0.55, 0);
+      g.add(plat);
+      // 4 Pillars
+      const pg = new THREE.CylinderGeometry(0.14 * s, 0.18 * s, 3.8 * s, 6);
+      [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(([dx, dz]) => {
+        const p = new THREE.Mesh(pg, pilMat);
+        p.position.set(dx * 2.2 * s, WY + 1.1 + 1.9 * s, dz * 2.2 * s);
+        g.add(p);
+      });
+      // Roof
+      const rf = new THREE.Mesh(new THREE.ConeGeometry(4.2 * s, 2.4 * s, 4), roofMat);
+      rf.position.y = WY + 1.1 + 3.8 * s + 1.2 * s;
+      rf.rotation.y = Math.PI / 4;
+      g.add(rf);
+      // Overhang
+      const oh = new THREE.Mesh(new THREE.BoxGeometry(7.5 * s, 0.12, 7.5 * s), roofMat);
+      oh.position.y = WY + 1.1 + 3.8 * s;
+      g.add(oh);
+      // Finial
+      const fn = new THREE.Mesh(new THREE.ConeGeometry(0.1 * s, 0.7 * s, 5),
+        new THREE.MeshLambertMaterial({ color: 0x5a5040 }));
+      fn.position.y = WY + 1.1 + 3.8 * s + 2.4 * s + 0.35 * s;
+      g.add(fn);
+      g.position.set(x, 0, z);
+      scene.add(g);
+    }
+
+    makePavilion(-18, -12, 1);
+    makePavilion(20, 15, 0.75);
+
+    // ══════════════════════════════════════════════════════════════
+    // SHRINES + STUPA (minimal geometry)
+    // ══════════════════════════════════════════════════════════════
+    const sMat = new THREE.MeshLambertMaterial({ color: 0x3a2e20 });
+    [[-HW - 2, HD - 5], [HW + 2, -HD + 8], [-HW - 2, -HD + 10], [HW + 2, HD - 10]].forEach(([x, z]) => {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.4, 1.4), sMat);
+      b.position.set(x, GY + 0.7, z);
+      scene.add(b);
+      const sp = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.6, 5), sMat);
+      sp.position.set(x, GY + 1.4 + 0.8, z);
+      scene.add(sp);
+    });
+
+    // Stupa
+    const stMat = new THREE.MeshLambertMaterial({ color: 0x505560 });
+    const stBase = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 1.4, 8), stMat);
+    stBase.position.set(-HW - 3, GY + 0.7, -18);
+    scene.add(stBase);
+    const stDome = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2), stMat);
+    stDome.position.set(-HW - 3, GY + 1.4, -18);
+    scene.add(stDome);
+
+    // ══════════════════════════════════════════════════════════════
+    // TREES — fewer spheres per tree, less total
+    // ══════════════════════════════════════════════════════════════
+    const trkMat = new THREE.MeshLambertMaterial({ color: 0x1e1408 });
+    const cnpMat = new THREE.MeshLambertMaterial({ color: 0x182030 });
+
+    function addTree(x, z, sc) {
+      const th = (3.5 + Math.random() * 1.5) * sc;
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.1 * sc, .18 * sc, th, 5), trkMat);
+      trunk.position.set(x, GY + th / 2, z);
+      scene.add(trunk);
+      // Only 3 canopy spheres
+      for (let i = 0; i < 3; i++) {
+        const r = (1.6 + Math.random() * 1.2) * sc;
+        const leaf = new THREE.Mesh(new THREE.SphereGeometry(r, 6, 4), cnpMat);
+        leaf.position.set(x + (Math.random() - .5) * 2 * sc, GY + th + Math.random() * sc, z + (Math.random() - .5) * 2 * sc);
+        scene.add(leaf);
+      }
+    }
+
+    // 5 per side instead of 7
+    for (let i = 0; i < 5; i++) addTree(-24 + i * 12, HD + 3.5, .9 + Math.random() * .2);
+    for (let i = 0; i < 5; i++) addTree(-24 + i * 12, -HD - 3.5, .9 + Math.random() * .2);
+    for (let i = 0; i < 4; i++) addTree(HW + 3.5, -16 + i * 10, .85 + Math.random() * .2);
+    for (let i = 0; i < 4; i++) addTree(-HW - 3.5, -16 + i * 10, .85 + Math.random() * .2);
+
+    // ══════════════════════════════════════════════════════════════
+    // LAMP POSTS (visual only — no extra lights, just emissive)
+    // ══════════════════════════════════════════════════════════════
+    const lpMat = new THREE.MeshLambertMaterial({ color: 0x333333 });
+    const lhMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x99aacc, emissiveIntensity: 2.0 });
+    [
+      [-22, HD + 3], [0, HD + 3], [22, HD + 3],
+      [-22, -HD - 3], [0, -HD - 3], [22, -HD - 3],
+      [HW + 3, -12], [HW + 3, 12],
+      [-HW - 3, -12], [-HW - 3, 12],
+    ].forEach(([x, z]) => {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(.05, .08, 3.8, 4), lpMat);
+      post.position.set(x, GY + 1.9, z);
+      scene.add(post);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(.18, 6, 4), lhMat);
+      head.position.set(x, GY + 3.9, z);
+      scene.add(head);
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // BENCHES — 4 only
+    // ══════════════════════════════════════════════════════════════
+    const bnMat = new THREE.MeshLambertMaterial({ color: 0x2a2018 });
+    [[-12, HD + 3.5], [12, HD + 3.5], [-12, -HD - 3.5], [12, -HD - 3.5]].forEach(([x, z]) => {
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(1.8, .12, .5), bnMat);
+      seat.position.set(x, GY + .45, z);
+      scene.add(seat);
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // RAIN — 1500 particles (down from 4000)
+    // ══════════════════════════════════════════════════════════════
+    const RC = 1500;
+    const rGeo = new THREE.BufferGeometry();
+    const rPos = new Float32Array(RC * 3);
+    const rVel = new Float32Array(RC);
+    const rSpread = 100, rH = 35;
+    for (let i = 0; i < RC; i++) {
+      rPos[i * 3] = (Math.random() - .5) * rSpread;
+      rPos[i * 3 + 1] = Math.random() * rH;
+      rPos[i * 3 + 2] = (Math.random() - .5) * rSpread;
+      rVel[i] = 9 + Math.random() * 5;
+    }
+    rGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
+    scene.add(new THREE.Points(rGeo, new THREE.PointsMaterial({
+      color: 0x8899bb, size: .04, transparent: true, opacity: .25,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    })));
+
+    // ══════════════════════════════════════════════════════════════
+    // STARS — 2000 (down from 4500+1500 milky way)
+    // ══════════════════════════════════════════════════════════════
+    const SC = 600, SR = 180;
+    const sGeo = new THREE.BufferGeometry();
+    const sPos = new Float32Array(SC * 3);
+    const sCol = new Float32Array(SC * 3);
+    for (let i = 0; i < SC; i++) {
+      const th = Math.random() * Math.PI * 2;
+      const ph = Math.acos(2 * Math.random() - 1) * 0.55;
+      sPos[i * 3] = SR * Math.sin(ph) * Math.cos(th);
+      sPos[i * 3 + 1] = SR * Math.cos(ph);
+      sPos[i * 3 + 2] = SR * Math.sin(ph) * Math.sin(th);
+      const t = Math.random();
+      sCol[i * 3] = .7 + t * .3;
+      sCol[i * 3 + 1] = .75 + t * .25;
+      sCol[i * 3 + 2] = .85 + t * .15;
+    }
+    sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+    sGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
+    scene.add(new THREE.Points(sGeo, new THREE.PointsMaterial({
+      size: 0.8, vertexColors: true, transparent: true, opacity: .85,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    })));
+
+    // ══════════════════════════════════════════════════════════════
+    // CLOUDS — soft translucent shapes drifting in the sky
+    // ══════════════════════════════════════════════════════════════
+    // Shared low-poly sphere for all cloud puffs (reuse geometry)
+    const cloudSphere = new THREE.SphereGeometry(1, 7, 5);
+    const cloudMat = new THREE.MeshBasicMaterial({
+      color: 0x5a6a8a, transparent: true, opacity: 0.3,
+      depthWrite: false, fog: true
+    });
+    const cloudData = [
+      // [x, y, z, spread, puffs]
+      [-60, 55, -40, 18, 8],
+      [20, 50, -60, 22, 9],
+      [70, 58, -20, 15, 7],
+      [-30, 52, 50, 20, 8],
+      [50, 48, 40, 16, 7],
+      [-80, 54, 10, 19, 8],
+      [0, 60, -80, 22, 9],
+      [90, 53, -50, 15, 7],
+      [-50, 56, -70, 20, 8],
+      [40, 51, 70, 17, 7],
+      [-10, 57, 30, 14, 6],
+      [60, 49, -10, 16, 7],
+    ];
+    cloudData.forEach(([cx, cy, cz, spread, puffs]) => {
+      // Build each cloud from overlapping spheres
+      for (let j = 0; j < puffs; j++) {
+        const puff = new THREE.Mesh(cloudSphere, cloudMat);
+        // Scatter puffs in a flattened ellipsoid shape
+        const angle = (j / puffs) * Math.PI * 2 + Math.random() * 0.8;
+        const dist = Math.random() * spread * 0.5;
+        const px = cx + Math.cos(angle) * dist;
+        const pz = cz + Math.sin(angle) * dist;
+        const py = cy + (Math.random() - 0.5) * 3;
+        puff.position.set(px, py, pz);
+        // Varied sizes, flattened vertically for cloud shape
+        const size = 4 + Math.random() * 6;
+        puff.scale.set(size * (1 + Math.random() * 0.5), size * 0.35, size * (0.8 + Math.random() * 0.4));
+        scene.add(puff);
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // BRIDGE from main pavilion to west walkway
+    // ══════════════════════════════════════════════════════════════
+    const bridgeMat = new THREE.MeshLambertMaterial({ color: 0x3a2e22 });
+    const bridgeGeo = new THREE.BoxGeometry(HW - 18 + 1, 0.4, 3);
+    const bridge = new THREE.Mesh(bridgeGeo, bridgeMat);
+    bridge.position.set(-(18 + HW) / 2, GY, -12);
+    scene.add(bridge);
+
+    // Bridge from second pavilion to south walkway
+    const bridge2Geo = new THREE.BoxGeometry(3, 0.4, HD - 15 + 1);
+    const bridge2 = new THREE.Mesh(bridge2Geo, bridgeMat);
+    bridge2.position.set(20, GY, (15 + HD) / 2);
+    scene.add(bridge2);
+
+    // ══════════════════════════════════════════════════════════════
+    // COLLISION — allows pavilions + bridges
+    // ══════════════════════════════════════════════════════════════
+    function valid(p) {
+      // World boundary
+      if (Math.abs(p.x) > 58 || Math.abs(p.z) > 48) return false;
+
+      // Outside the pond = always OK
+      const inPond = p.x > -HW + .5 && p.x < HW - .5 && p.z > -HD + .5 && p.z < HD - .5;
+      if (!inPond) return true;
+
+      // Inside pond — only allow on pavilion platforms + bridges
+      // Main pavilion platform (-18, -12), size ~7x7
+      if (p.x > -22 && p.x < -14 && p.z > -16 && p.z < -8) return true;
+      // Bridge from main pavilion to west wall
+      if (p.x > -HW && p.x < -14 && p.z > -14 && p.z < -10) return true;
+      // Second pavilion platform (20, 15), size ~5x5
+      if (p.x > 17 && p.x < 23 && p.z > 12 && p.z < 18) return true;
+      // Bridge from second pavilion to south wall
+      if (p.x > 18 && p.x < 22 && p.z > 12 && p.z < HD) return true;
+
+      return false;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ANIMATION — minimal per-frame work
+    // ══════════════════════════════════════════════════════════════
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05); // cap delta
+      const t = clock.getElapsedTime();
+
+      // Movement
+      if (controls.isLocked) {
+        const prev = camera.position.clone();
+        const s = SPD * dt;
+        if (keys.KeyW) controls.moveForward(s);
+        if (keys.KeyS) controls.moveForward(-s);
+        if (keys.KeyD) controls.moveRight(s);
+        if (keys.KeyA) controls.moveRight(-s);
+        camera.position.y = PH;
+        if (!valid(camera.position)) camera.position.copy(prev);
+      }
+
+      // Water time
+      wU.u_time.value = t;
+
+      // Rain — simple loop
+      const rp = rGeo.attributes.position.array;
+      for (let i = 0; i < RC; i++) {
+        rp[i * 3 + 1] -= rVel[i] * dt;
+        if (rp[i * 3 + 1] < -.5) {
+          rp[i * 3] = camera.position.x + (Math.random() - .5) * rSpread;
+          rp[i * 3 + 1] = rH;
+          rp[i * 3 + 2] = camera.position.z + (Math.random() - .5) * rSpread;
+        }
+      }
+      rGeo.attributes.position.needsUpdate = true;
+
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
+  </script>
+</body>
+
+</html>

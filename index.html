@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sandhuu ko birthdayyy</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;1,400;1,600&family=Nunito:wght@300;400;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8EF;
+      --warm: #F5E6D3;
+      --blush: #F2C4B0;
+      --rose: #E8917A;
+      --dusty-rose: #C9706A;
+      --deep: #3D2B1F;
+      --midnight: #1A1A2E;
+      --twilight: #2C2C54;
+      --gold: #F4C67B;
+      --sky: #B8D4E8;
+      --sage: #8BAF8B;
+      --forest: #4A7C59;
+      --teal-night: #0F3460;
+      --pond: #3A7CA5;
+      --pond-light: #6DB5D4;
+      --pink-lip: #E8758A;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--cream);
+      color: var(--deep);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 999;
+      background: rgba(255, 248, 239, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--blush);
+      padding: 10px 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 0 16px;
+    }
+
+    .nav-dot {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Caveat', cursive;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--deep);
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 20px;
+      transition: all .3s ease;
+      text-decoration: none;
+      border: 1.5px solid transparent;
+    }
+
+    .nav-dot:hover {
+      background: var(--blush);
+      border-color: var(--rose);
+    }
+
+    .nav-dot span.emoji {
+      font-size: 16px;
+    }
+
+    .nav-sep {
+      color: var(--blush);
+      font-size: 18px;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── TITLE SECTION ── */
+    #title {
+      background: linear-gradient(160deg, #FFF0E6 0%, #F5E0D0 40%, #E8C9B8 100%);
+    }
+
+    .title-cloud-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50px;
+      opacity: 0.55;
+      animation: floatCloud linear infinite;
+    }
+
+    .cloud::before,
+    .cloud::after {
+      content: '';
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+
+    @keyframes floatCloud {
+      0% {
+        transform: translateX(-200px);
+      }
+
+      100% {
+        transform: translateX(110vw);
+      }
+    }
+
+    .title-content {
+      position: relative;
+      z-index: 4;
+      text-align: center;
+      animation: fadeUp .9s ease both;
+    }
+
+    .hearts-top {
+      font-size: 28px;
+      letter-spacing: 8px;
+      margin-bottom: 16px;
+      animation: heartbeat 1.8s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+
+      0%,
+      100% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.1)
+      }
+    }
+
+    .title-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(48px, 9vw, 96px);
+      font-style: italic;
+      font-weight: 600;
+      color: var(--dusty-rose);
+      line-height: 1;
+      text-shadow: 3px 3px 0 rgba(232, 145, 122, 0.3);
+    }
+
+    .title-amp {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 6vw, 68px);
+      font-style: italic;
+      color: var(--rose);
+      display: block;
+      margin: 4px 0;
+    }
+
+    .title-sub {
+      font-family: 'Caveat', cursive;
+      font-size: clamp(18px, 3vw, 28px);
+      color: var(--deep);
+      margin-top: 16px;
+      opacity: 0.8;
+    }
+
+    .scroll-hint {
+      margin-top: 40px;
+      font-family: 'Caveat', cursive;
+      font-size: 16px;
+      color: var(--rose);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(8px)
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* ── COUPLE SVG (Title page) ── */
+    .couple-svg-container {
+      margin: 28px auto 0;
+      width: min(510px, 95vw);
+      animation: fadeUp 1.2s .3s ease both;
+    }
+
+    /* ── SCENE SECTIONS ── */
+    .scene-wrapper {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px 40px;
+    }
+
+    .scene-label {
+      font-family: 'Caveat', cursive;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 8px;
+    }
+
+    .scene-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 5vw, 52px);
+      font-style: italic;
+      margin-bottom: 8px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .scene-date {
+      font-family: 'Caveat', cursive;
+      font-size: 18px;
+      margin-bottom: 24px;
+      opacity: 0.7;
+    }
+
+    .scene-illustration {
+      width: min(700px, 94vw);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .scene-story {
+      max-width: 560px;
+      text-align: center;
+      font-size: clamp(15px, 2.2vw, 18px);
+      line-height: 1.7;
+      font-family: 'Caveat', cursive;
+      font-size: 20px;
+      color: var(--deep);
+      opacity: 0.85;
+    }
+
+    /* ── SECTION 2: BRIDGE (first meeting) ── */
+    #meeting {
+      background: linear-gradient(170deg, #E8F4FB 0%, #C9E5F4 50%, #A8D5EA 100%);
+    }
+
+    #meeting .scene-label {
+      color: var(--pond);
+    }
+
+    #meeting .scene-title {
+      color: #1A5276;
+    }
+
+    /* ── SECTION 3: AIRPORT (first date) ── */
+    #first-date {
+      background: linear-gradient(160deg, #FFF3E0 0%, #FFE0B2 50%, #FFCC80 100%);
+    }
+
+    #first-date .scene-label {
+      color: #E65100;
+    }
+
+    #first-date .scene-title {
+      color: #5D4037;
+    }
+
+    /* ── SECTION 4: BASANTAPUR ── */
+    #second-date {
+      background: linear-gradient(160deg, #F3E5F5 0%, #E1BEE7 50%, #CE93D8 70%, #F8BBD9 100%);
+    }
+
+    #second-date .scene-label {
+      color: #6A1B9A;
+    }
+
+    #second-date .scene-title {
+      color: #4A148C;
+    }
+
+    /* ── SECTION 5: KAMALPOKHARI ── */
+    #night-date {
+      background: linear-gradient(160deg, #0D1B2A 0%, #1A2744 30%, #0F3460 60%, #1B4F72 100%);
+      color: var(--cream);
+    }
+
+    #night-date .scene-label {
+      color: var(--pond-light);
+    }
+
+    #night-date .scene-title {
+      color: #AED6F1;
+    }
+
+    #night-date .scene-story {
+      color: #D6EAF8;
+    }
+
+    #night-date .scene-date {
+      color: #AED6F1;
+    }
+
+    /* ── SCENE 1: SINAMANGAL BRIDGE (first meeting) ── */
+    svg.scene {
+      width: 100%;
+      border-radius: 20px;
+      display: block;
+    }
+
+    /* ── FLOATING PETALS ── */
+    .petal {
+      position: absolute;
+      pointer-events: none;
+      font-size: 14px;
+      animation: petalFall linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes petalFall {
+      0% {
+        transform: translateY(-40px) rotate(0deg) translateX(0);
+        opacity: .85
+      }
+
+      50% {
+        opacity: .7
+      }
+
+      100% {
+        transform: translateY(120vh) rotate(1080deg) translateX(60px);
+        opacity: 0
+      }
+    }
+
+    /* ── STARS ── */
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      pointer-events: none;
+      animation: twinkle ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+
+      0%,
+      100% {
+        opacity: .2;
+        transform: scale(1)
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.3)
+      }
+    }
+
+    /* ── FIREFLY ── */
+    .firefly {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #90EE90;
+      box-shadow: 0 0 6px 3px rgba(144, 238, 144, 0.6);
+      animation: fireflyMove ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes fireflyMove {
+      0% {
+        transform: translate(0, 0);
+        opacity: 0
+      }
+
+      20% {
+        opacity: 1
+      }
+
+      50% {
+        transform: translate(var(--fx), var(--fy));
+        opacity: .8
+      }
+
+      80% {
+        opacity: 1
+      }
+
+      100% {
+        transform: translate(0, 0);
+        opacity: 0
+      }
+    }
+
+    /* ── VISIBLE SCROLL SNAP ── */
+    .section-in {
+      animation: fadeUp .7s ease both;
+    }
+
+    /* ── SCENE PHOTO FRAMES ── */
+    .scene-photos {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* Shared frame base */
+    .photo-frame {
+      position: absolute;
+      pointer-events: auto;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.15);
+      border: 3px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .photo-frame:hover {
+      transform: scale(1.05) !important;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.32);
+      z-index: 5;
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── PHOTO FRAME ANIMATIONS ── */
+
+    /* Gentle vertical drift */
+    @keyframes frameFloat {
+
+      0%,
+      100% {
+        translate: 0 0px;
+      }
+
+      50% {
+        translate: 0 -8px;
+      }
+    }
+
+    /* Soft glow pulse on border + shadow */
+    @keyframes frameGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18),
+          0 0 0px rgba(255, 200, 180, 0);
+      }
+
+      50% {
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22),
+          0 0 18px rgba(240, 160, 140, 0.45);
+      }
+    }
+
+    /* Polaroid pendulum sway (tiny rotation oscillation) */
+    @keyframes polaroidSwayL {
+
+      0%,
+      100% {
+        transform: rotate(-8deg) translateY(0px);
+      }
+
+      50% {
+        transform: rotate(-5deg) translateY(-6px);
+      }
+    }
+
+    @keyframes polaroidSwayR {
+
+      0%,
+      100% {
+        transform: rotate(7deg) translateY(0px);
+      }
+
+      50% {
+        transform: rotate(4deg) translateY(-6px);
+      }
+    }
+
+    /* Blob border-radius morph */
+    @keyframes blobMorph {
+      0% {
+        border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+      }
+
+      33% {
+        border-radius: 50% 50% 40% 60% / 55% 40% 60% 45%;
+      }
+
+      66% {
+        border-radius: 40% 60% 60% 40% / 40% 60% 45% 55%;
+      }
+
+      100% {
+        border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+      }
+    }
+
+    /* Circle gentle scale pulse */
+    @keyframes circlePulse {
+
+      0%,
+      100% {
+        transform: rotate(4deg) scale(1);
+      }
+
+      50% {
+        transform: rotate(4deg) scale(1.04);
+      }
+    }
+
+    /* Night-mode glow (blue tint) */
+    @keyframes frameGlowNight {
+
+      0%,
+      100% {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35),
+          0 0 0px rgba(100, 180, 255, 0);
+      }
+
+      50% {
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.42),
+          0 0 20px rgba(100, 180, 255, 0.35);
+      }
+    }
+
+    /* ── Shape 1: Polaroid top-left ── */
+    .frame-polaroid-tl {
+      width: clamp(100px, 13vw, 150px);
+      height: clamp(115px, 15vw, 170px);
+      border-radius: 6px;
+      top: clamp(60px, 7vh, 90px);
+      left: clamp(12px, 3vw, 48px);
+      padding-bottom: 28px;
+      background: white;
+      animation:
+        polaroidSwayL 5s ease-in-out infinite,
+        frameGlow 4s ease-in-out infinite;
+      animation-delay: 0s, 0.5s;
+    }
+
+    .frame-polaroid-tl::after {
+      content: '📸';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      opacity: 0.5;
+    }
+
+    /* ── Shape 2: Polaroid top-right ── */
+    .frame-polaroid-tr {
+      width: clamp(100px, 13vw, 150px);
+      height: clamp(115px, 15vw, 170px);
+      border-radius: 6px;
+      top: clamp(60px, 7vh, 90px);
+      right: clamp(12px, 3vw, 48px);
+      padding-bottom: 28px;
+      background: white;
+      animation:
+        polaroidSwayR 6s ease-in-out infinite,
+        frameGlow 5s ease-in-out infinite;
+      animation-delay: 1s, 2s;
+    }
+
+    .frame-polaroid-tr::after {
+      content: '📸';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      opacity: 0.5;
+    }
+
+    /* ── Shape 3: Circle bottom-right ── */
+    .frame-circle-br {
+      width: clamp(100px, 13vw, 145px);
+      height: clamp(100px, 13vw, 145px);
+      border-radius: 50%;
+      bottom: clamp(55px, 9vh, 100px);
+      right: clamp(12px, 3vw, 48px);
+      animation:
+        circlePulse 5.5s ease-in-out infinite,
+        frameGlow 6s ease-in-out infinite;
+      animation-delay: 0.8s, 1.5s;
+    }
+
+    /* ── Shape 4: Organic blob bottom-left ── */
+    .frame-blob-bl {
+      width: clamp(100px, 13vw, 145px);
+      height: clamp(100px, 13vw, 145px);
+      bottom: clamp(55px, 9vh, 100px);
+      left: clamp(12px, 3vw, 48px);
+      animation:
+        blobMorph 8s ease-in-out infinite,
+        frameFloat 5s ease-in-out infinite,
+        frameGlow 4.5s ease-in-out infinite;
+      animation-delay: 0s, 0.3s, 1s;
+    }
+
+    /* Placeholder label when no image */
+    .photo-frame .photo-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+      height: 100%;
+      font-family: 'Caveat', cursive;
+      font-size: clamp(11px, 1.4vw, 14px);
+      color: rgba(80, 40, 30, 0.65);
+      text-align: center;
+      padding: 8px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .photo-frame .photo-hint span {
+      font-size: clamp(22px, 3vw, 32px);
+      line-height: 1;
+    }
+
+    /* Dark-section overrides */
+    #night-date .photo-frame {
+      border-color: rgba(174, 214, 241, 0.45);
+      background: rgba(15, 52, 96, 0.35);
+      animation-name: polaroidSwayL, frameGlowNight !important;
+    }
+
+    #night-date .frame-polaroid-tr {
+      animation-name: polaroidSwayR, frameGlowNight !important;
+    }
+
+    #night-date .frame-circle-br {
+      animation-name: circlePulse, frameGlowNight !important;
+    }
+
+    #night-date .frame-blob-bl {
+      animation-name: blobMorph, frameFloat, frameGlowNight !important;
+    }
+
+    #night-date .photo-frame .photo-hint {
+      color: rgba(174, 214, 241, 0.75);
+    }
+
+    /* responsive */
+    @media(max-width:600px) {
+      .nav-sep {
+        display: none
+      }
+
+      .nav-dot {
+        font-size: 11px;
+        padding: 3px 8px
+      }
+
+      .frame-polaroid-tl,
+      .frame-polaroid-tr {
+        width: 80px;
+        height: 96px;
+        padding-bottom: 20px;
+      }
+
+      .frame-circle-br,
+      .frame-blob-bl {
+        width: 80px;
+        height: 80px;
+      }
+    }
+
+    /* ── SPOTIFY PLAYER ── */
+    .spotify-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .spotify-toggle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1DB954, #1ed760);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 20px rgba(29, 185, 84, 0.45);
+      transition: all 0.3s ease;
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    .spotify-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 28px rgba(29, 185, 84, 0.6);
+    }
+
+    @keyframes pulseGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 4px 20px rgba(29, 185, 84, 0.45);
+      }
+
+      50% {
+        box-shadow: 0 4px 28px rgba(29, 185, 84, 0.7);
+      }
+    }
+
+    .spotify-player-container {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: bottom right;
+    }
+
+    .spotify-player-container.hidden {
+      position: fixed;
+      right: 20px;
+      bottom: 80px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+    }
+
+    .spotify-player-container.visible {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    /* ── MUSIC START OVERLAY ── */
+    .music-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 0.5s ease;
+    }
+
+    .music-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .music-overlay-content {
+      text-align: center;
+      color: white;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .music-overlay-content .emoji-big {
+      font-size: 64px;
+      display: block;
+      margin-bottom: 16px;
+      animation: heartbeat 1.8s ease-in-out infinite;
+    }
+
+    .music-overlay-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: var(--blush);
+    }
+
+    .music-overlay-content p {
+      font-family: 'Caveat', cursive;
+      font-size: 20px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+
+
+
+  <!-- Floating Spotify Player -->
+  <div class="spotify-float">
+    <div class="spotify-player-container hidden" id="spotifyPlayer">
+      <div id="spotifyEmbedTarget" style="width:300px;height:380px;"></div>
+    </div>
+    <button class="spotify-toggle" id="spotifyToggle" title="Toggle Music Player">🎵</button>
+  </div>
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- TITLE SECTION -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="title">
+    <!-- Clouds -->
+    <div class="title-cloud-bg" aria-hidden="true">
+      <div class="cloud" style="width:120px;height:40px;top:12%;left:-150px;animation-duration:28s;animation-delay:0s">
+      </div>
+      <div class="cloud" style="width:80px;height:28px;top:28%;left:-100px;animation-duration:22s;animation-delay:6s">
+      </div>
+      <div class="cloud" style="width:160px;height:50px;top:55%;left:-200px;animation-duration:35s;animation-delay:12s">
+      </div>
+      <div class="cloud" style="width:100px;height:35px;top:70%;left:-130px;animation-duration:25s;animation-delay:3s">
+      </div>
+      <!-- Petals & Sunflowers -->
+      <div class="petal" style="left:5%;animation-duration:7s;animation-delay:0s">🌸</div>
+      <div class="petal" style="left:15%;animation-duration:10s;animation-delay:1.5s">🌻</div>
+      <div class="petal" style="left:25%;animation-duration:8s;animation-delay:3s">🌸</div>
+      <div class="petal" style="left:35%;animation-duration:9s;animation-delay:0.5s">🌻</div>
+      <div class="petal" style="left:45%;animation-duration:6s;animation-delay:4s">🌸</div>
+      <div class="petal" style="left:55%;animation-duration:11s;animation-delay:2s">🌻</div>
+      <div class="petal" style="left:65%;animation-duration:7.5s;animation-delay:1s">🌸</div>
+      <div class="petal" style="left:72%;animation-duration:9.5s;animation-delay:3.5s">🌻</div>
+      <div class="petal" style="left:80%;animation-duration:8s;animation-delay:5s">🌸</div>
+      <div class="petal" style="left:88%;animation-duration:10.5s;animation-delay:0.8s">🌻</div>
+      <div class="petal" style="left:93%;animation-duration:6.5s;animation-delay:2.5s">🌸</div>
+      <div class="petal" style="left:48%;animation-duration:12s;animation-delay:4.5s">🌻</div>
+    </div>
+    <!-- ── Photo frames (replace src paths with your own images) ── -->
+    <div class="scene-photos">
+      <!-- 1: top-left polaroid -->
+      <div class="photo-frame frame-polaroid-tl">
+        <img src="1.jpg" alt="Photo 1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_1.jpg</div>
+      </div>
+      <!-- 2: top-right polaroid -->
+      <div class="photo-frame frame-polaroid-tr">
+        <img src="2.jpg" alt="Photo 2" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_2.jpg</div>
+      </div>
+      <!-- 3: circle bottom-right -->
+      <div class="photo-frame frame-circle-br">
+        <img src="3.png" alt="Photo 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_3.jpg</div>
+      </div>
+      <!-- 4: blob bottom-left -->
+      <div class="photo-frame frame-blob-bl">
+        <img src="4.png" alt="Photo 4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_4.jpg</div>
+      </div>
+    </div>
+
+    <div class="title-content">
+      <div class="hearts-top">💗 💗 💗</div>
+      <div class="title-name">Happy Birthdayyyyy Myyyy Sandhyaaaaa</div>
+      <p class="title-sub"></p>
+
+      <!-- Couple illustration on title page -->
+      <div class="couple-svg-container">
+        <img src="sticker_title.png" alt="Krish & Sandhya - Animated Sticker"
+          style="width:100%; border-radius:20px; filter: drop-shadow(0 8px 24px rgba(201,112,106,0.35));">
+      </div>
+
+
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 2: SINAMANGAL BRIDGE — First Glance -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="meeting">
+    <!-- Scattered petals & sunflowers -->
+    <div class="petal" style="left:5%;animation-duration:10s;animation-delay:1s">🌸</div>
+    <div class="petal" style="left:18%;animation-duration:8.5s;animation-delay:0s">🌻</div>
+    <div class="petal" style="left:32%;animation-duration:9s;animation-delay:2.5s">🌸</div>
+    <div class="petal" style="left:48%;animation-duration:11s;animation-delay:1.5s">🌻</div>
+    <div class="petal" style="left:62%;animation-duration:7.5s;animation-delay:4s">🌸</div>
+    <div class="petal" style="left:75%;animation-duration:10s;animation-delay:0.5s">🌻</div>
+    <div class="petal" style="left:82%;animation-duration:8s;animation-delay:3s">🌸</div>
+    <div class="petal" style="left:92%;animation-duration:9.5s;animation-delay:2s">🌻</div>
+
+    <!-- ── Photo frames (replace src paths with your own images) ── -->
+    <div class="scene-photos">
+      <!-- 1: top-left polaroid -->
+      <div class="photo-frame frame-polaroid-tl">
+        <img src="5.jpg" alt="Photo 1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_1.jpg</div>
+      </div>
+      <!-- 2: top-right polaroid -->
+      <div class="photo-frame frame-polaroid-tr">
+        <img src="6.jpg" alt="Photo 2" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_2.jpg</div>
+      </div>
+      <!-- 3: circle bottom-right -->
+      <div class="photo-frame frame-circle-br">
+        <img src="7.jpg" alt="Photo 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_3.jpg</div>
+      </div>
+      <!-- 4: blob bottom-left -->
+      <div class="photo-frame frame-blob-bl">
+        <img src="8.jpg" alt="Photo 4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_meeting_4.jpg</div>
+      </div>
+    </div>
+
+    <div class="scene-wrapper">
+      <h2 class="scene-title">I Saw Your Eyes</h2>
+
+      <div class="scene-illustration">
+        <!-- SINAMANGAL BRIDGE SCENE -->
+        <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" class="scene">
+          <!-- Sky gradient — bright Kathmandu day -->
+          <defs>
+            <linearGradient id="skyBridge" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#B8D4E8" />
+              <stop offset="60%" stop-color="#D6EAF5" />
+              <stop offset="100%" stop-color="#EBF5FB" />
+            </linearGradient>
+            <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9E9E9E" />
+              <stop offset="100%" stop-color="#757575" />
+            </linearGradient>
+            <linearGradient id="river" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7FB3CC" />
+              <stop offset="100%" stop-color="#5A9BB5" />
+            </linearGradient>
+          </defs>
+
+          <!-- Sky -->
+          <rect width="700" height="420" fill="url(#skyBridge)" />
+
+          <!-- Background mountains (Kathmandu valley hills) -->
+          <path d="M0,200 Q80,140 180,160 Q260,130 340,150 Q420,120 500,145 Q580,130 700,160 L700,260 L0,260Z"
+            fill="#8BAF8B" opacity="0.5" />
+          <path d="M0,220 Q100,170 200,185 Q300,165 400,180 Q500,160 600,175 L700,185 L700,280 L0,280Z" fill="#6B9A6B"
+            opacity="0.6" />
+
+          <!-- Bagmati River below -->
+          <rect x="0" y="290" width="700" height="80" fill="url(#river)" rx="0" />
+          <!-- River ripples -->
+          <path d="M50,305 Q100,300 150,305" fill="none" stroke="white" stroke-width="1.5" opacity="0.4" />
+          <path d="M200,315 Q260,310 320,315" fill="none" stroke="white" stroke-width="1.5" opacity="0.4" />
+          <path d="M400,308 Q450,303 500,308" fill="none" stroke="white" stroke-width="1.5" opacity="0.4" />
+          <path d="M550,320 Q600,315 650,320" fill="none" stroke="white" stroke-width="1.5" opacity="0.4" />
+
+          <!-- Bridge structure -->
+          <!-- Bridge deck -->
+          <rect x="0" y="265" width="700" height="30" fill="#B0B0B0" rx="2" />
+          <!-- Railing top bar -->
+          <rect x="0" y="255" width="700" height="8" fill="#A0A0A0" rx="3" />
+          <!-- Railing posts -->
+          <g fill="#888888">
+            <rect x="30" y="230" width="6" height="35" rx="2" />
+            <rect x="65" y="230" width="6" height="35" rx="2" />
+            <rect x="100" y="230" width="6" height="35" rx="2" />
+            <rect x="135" y="230" width="6" height="35" rx="2" />
+            <rect x="170" y="230" width="6" height="35" rx="2" />
+            <rect x="205" y="230" width="6" height="35" rx="2" />
+            <rect x="240" y="230" width="6" height="35" rx="2" />
+            <rect x="275" y="230" width="6" height="35" rx="2" />
+            <rect x="310" y="230" width="6" height="35" rx="2" />
+            <rect x="345" y="230" width="6" height="35" rx="2" />
+            <rect x="380" y="230" width="6" height="35" rx="2" />
+            <rect x="415" y="230" width="6" height="35" rx="2" />
+            <rect x="450" y="230" width="6" height="35" rx="2" />
+            <rect x="485" y="230" width="6" height="35" rx="2" />
+            <rect x="520" y="230" width="6" height="35" rx="2" />
+            <rect x="555" y="230" width="6" height="35" rx="2" />
+            <rect x="590" y="230" width="6" height="35" rx="2" />
+            <rect x="625" y="230" width="6" height="35" rx="2" />
+            <rect x="660" y="230" width="6" height="35" rx="2" />
+          </g>
+          <!-- Horizontal railing bars -->
+          <rect x="0" y="238" width="700" height="5" fill="#999" rx="2" opacity="0.7" />
+
+          <!-- Road markings -->
+          <rect x="0" y="272" width="700" height="3" fill="white" opacity="0.3" />
+          <rect x="0" y="278" width="700" height="3" fill="white" opacity="0.3" />
+          <!-- Center dash line -->
+          <g opacity="0.5">
+            <rect x="50" y="274" width="30" height="3" fill="yellow" />
+            <rect x="120" y="274" width="30" height="3" fill="yellow" />
+            <rect x="200" y="274" width="30" height="3" fill="yellow" />
+            <rect x="280" y="274" width="30" height="3" fill="yellow" />
+            <rect x="360" y="274" width="30" height="3" fill="yellow" />
+            <rect x="440" y="274" width="30" height="3" fill="yellow" />
+            <rect x="520" y="274" width="30" height="3" fill="yellow" />
+            <rect x="600" y="274" width="30" height="3" fill="yellow" />
+          </g>
+
+          <!-- Buildings in background (Sinamangal area) -->
+          <!-- Left buildings -->
+          <rect x="20" y="170" width="45" height="95" fill="#D4C5A9" rx="3" />
+          <rect x="22" y="175" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="34" y="175" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="46" y="175" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="22" y="192" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="34" y="192" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="46" y="192" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="22" y="210" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="34" y="210" width="8" height="10" fill="#87CEEB" opacity="0.7" rx="1" />
+
+          <rect x="75" y="155" width="50" height="110" fill="#C8B89A" rx="3" />
+          <rect x="78" y="162" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="91" y="162" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="104" y="162" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="78" y="180" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="91" y="180" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="104" y="180" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="78" y="198" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="91" y="198" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="104" y="198" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="78" y="216" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="91" y="216" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+
+          <!-- Right buildings -->
+          <rect x="560" y="160" width="55" height="105" fill="#D4C5A9" rx="3" />
+          <rect x="563" y="167" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="576" y="167" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="589" y="167" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="602" y="167" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="563" y="185" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="576" y="185" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="589" y="185" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="602" y="185" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="563" y="203" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="576" y="203" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="589" y="203" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="602" y="203" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="563" y="221" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="576" y="221" width="9" height="11" fill="#87CEEB" opacity="0.7" rx="1" />
+
+          <rect x="630" y="150" width="60" height="115" fill="#BCA88A" rx="3" />
+          <rect x="633" y="157" width="10" height="12" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="648" y="157" width="10" height="12" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="663" y="157" width="10" height="12" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="633" y="175" width="10" height="12" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="648" y="175" width="10" height="12" fill="#87CEEB" opacity="0.7" rx="1" />
+          <rect x="663" y="175" width="10" height="12" fill="#87CEEB" opacity="0.7" rx="1" />
+
+          <!-- Trees on bridge sides -->
+          <circle cx="155" cy="222" r="18" fill="#5A8A5A" />
+          <circle cx="155" cy="218" r="14" fill="#6AA06A" />
+          <rect x="152" y="235" width="6" height="20" fill="#8B6040" />
+          <circle cx="540" cy="222" r="18" fill="#5A8A5A" />
+          <circle cx="540" cy="218" r="14" fill="#6AA06A" />
+          <rect x="537" y="235" width="6" height="20" fill="#8B6040" />
+
+          <!-- Clouds -->
+          <ellipse cx="150" cy="60" rx="55" ry="22" fill="white" opacity="0.85" />
+          <ellipse cx="120" cy="55" rx="35" ry="18" fill="white" opacity="0.85" />
+          <ellipse cx="180" cy="58" rx="30" ry="16" fill="white" opacity="0.85" />
+          <ellipse cx="500" cy="45" rx="60" ry="22" fill="white" opacity="0.8" />
+          <ellipse cx="470" cy="40" rx="40" ry="18" fill="white" opacity="0.8" />
+          <ellipse cx="540" cy="42" rx="35" ry="17" fill="white" opacity="0.8" />
+
+          <!-- Sticker image replacing SVG characters -->
+          <foreignObject x="180" y="140" width="340" height="270">
+            <img xmlns="http://www.w3.org/1999/xhtml" src="sticker_bridge.png" alt="First meeting on the bridge"
+              style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.25));">
+          </foreignObject>
+
+          <!-- Caption label -->
+
+
+        </svg>
+      </div>
+
+      <p class="scene-story">
+        I knew it the moment I saw your eyes. 💗
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 3: TIA AIRPORT ELEVATED PLATFORM — First Date -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="first-date">
+    <!-- ── Photo frames ── -->
+    <div class="scene-photos">
+      <div class="photo-frame frame-polaroid-tl">
+        <img src="9.jpg" alt="Photo 1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_firstdate_1.jpg</div>
+      </div>
+      <div class="photo-frame frame-polaroid-tr">
+        <img src="10.jpg" alt="Photo 2"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_firstdate_2.jpg</div>
+      </div>
+      <div class="photo-frame frame-circle-br">
+        <img src="11.jpg" alt="Photo 3"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_firstdate_3.jpg</div>
+      </div>
+      <div class="photo-frame frame-blob-bl">
+        <img src="12.jpg" alt="Photo 4"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_firstdate_4.jpg</div>
+      </div>
+    </div>
+    <div class="scene-wrapper">
+      <h2 class="scene-title">Coffee Smell & Lilac Skin</h2>
+
+      <div class="scene-illustration">
+        <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" class="scene">
+          <defs>
+            <linearGradient id="sunsetSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FF6B35" />
+              <stop offset="30%" stop-color="#FF8C42" />
+              <stop offset="55%" stop-color="#FFA559" />
+              <stop offset="75%" stop-color="#FFD166" />
+              <stop offset="100%" stop-color="#FFEDAA" />
+            </linearGradient>
+            <linearGradient id="sunGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+              <stop offset="0%" stop-color="#FFD700" stop-opacity="1" />
+              <stop offset="100%" stop-color="#FF8C00" stop-opacity="0" />
+            </linearGradient>
+            <radialGradient id="sunRadial" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FFF176" />
+              <stop offset="40%" stop-color="#FFD700" />
+              <stop offset="100%" stop-color="#FF8C00" stop-opacity="0.4" />
+            </radialGradient>
+            <linearGradient id="platformGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9E9E9E" />
+              <stop offset="100%" stop-color="#757575" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Sunset sky -->
+          <rect width="700" height="420" fill="url(#sunsetSky)" />
+
+          <!-- Sun glow -->
+          <circle cx="580" cy="220" r="90" fill="url(#sunRadial)" opacity="0.4" filter="url(#glow)" />
+          <!-- Sun disk -->
+          <circle cx="580" cy="220" r="42" fill="#FFD700" filter="url(#glow)" />
+          <circle cx="580" cy="220" r="35" fill="#FFF176" />
+
+          <!-- Horizon land (airport area, flat plains of Kathmandu valley) -->
+          <path d="M0,280 Q100,260 200,270 Q320,255 440,268 Q560,255 700,265 L700,420 L0,420Z" fill="#7A6845"
+            opacity="0.7" />
+          <path d="M0,295 Q150,278 280,285 Q420,272 560,282 L700,280 L700,420 L0,420Z" fill="#6B5C38" />
+
+          <!-- Airport buildings silhouette in distance -->
+          <rect x="80" y="255" width="70" height="40" fill="#5A4E30" rx="2" />
+          <rect x="82" y="248" width="66" height="10" fill="#4A3E28" rx="1" />
+          <!-- Control tower -->
+          <rect x="168" y="235" width="12" height="60" fill="#5A4E30" rx="1" />
+          <rect x="162" y="232" width="24" height="8" fill="#4A3E28" rx="2" />
+          <circle cx="174" cy="230" r="4" fill="#FFD700" opacity="0.8" />
+          <rect x="210" y="258" width="90" height="37" fill="#5A4E30" rx="2" />
+          <!-- Plane in distance -->
+          <path d="M480,210 L520,205 L518,208 L490,213Z" fill="#CCC" opacity="0.7" />
+          <path d="M495,207 L510,198 L512,202 L498,209Z" fill="#CCC" opacity="0.6" />
+
+          <!-- Elevated walkway/platform structure -->
+          <!-- Support pillars -->
+          <rect x="120" y="300" width="14" height="120" fill="#888" rx="2" />
+          <rect x="280" y="300" width="14" height="120" fill="#888" rx="2" />
+          <rect x="420" y="300" width="14" height="120" fill="#888" rx="2" />
+          <rect x="565" y="300" width="14" height="120" fill="#888" rx="2" />
+          <!-- Platform deck -->
+          <rect x="80" y="290" width="540" height="18" fill="url(#platformGrad)" rx="3" />
+          <!-- Platform top surface detail -->
+          <rect x="80" y="290" width="540" height="5" fill="#BDBDBD" rx="2" />
+          <!-- Railings -->
+          <rect x="80" y="272" width="540" height="7" fill="#9E9E9E" rx="3" />
+          <!-- Railing posts on platform -->
+          <g fill="#888">
+            <rect x="95" y="260" width="5" height="30" rx="1" />
+            <rect x="130" y="260" width="5" height="30" rx="1" />
+            <rect x="165" y="260" width="5" height="30" rx="1" />
+            <rect x="200" y="260" width="5" height="30" rx="1" />
+            <rect x="235" y="260" width="5" height="30" rx="1" />
+            <rect x="270" y="260" width="5" height="30" rx="1" />
+            <rect x="305" y="260" width="5" height="30" rx="1" />
+            <rect x="340" y="260" width="5" height="30" rx="1" />
+            <rect x="375" y="260" width="5" height="30" rx="1" />
+            <rect x="410" y="260" width="5" height="30" rx="1" />
+            <rect x="445" y="260" width="5" height="30" rx="1" />
+            <rect x="480" y="260" width="5" height="30" rx="1" />
+            <rect x="515" y="260" width="5" height="30" rx="1" />
+            <rect x="550" y="260" width="5" height="30" rx="1" />
+            <rect x="585" y="260" width="5" height="30" rx="1" />
+            <rect x="614" y="260" width="5" height="30" rx="1" />
+          </g>
+
+          <!-- Clouds (silhouetted in sunset) -->
+          <ellipse cx="100" cy="130" rx="60" ry="22" fill="#FF6B35" opacity="0.5" />
+          <ellipse cx="70" cy="125" rx="38" ry="18" fill="#FF8C42" opacity="0.4" />
+          <ellipse cx="140" cy="128" rx="35" ry="17" fill="#FF6B35" opacity="0.5" />
+
+          <ellipse cx="350" cy="100" rx="70" ry="24" fill="#FF8C42" opacity="0.4" />
+          <ellipse cx="315" cy="95" rx="44" ry="19" fill="#FFA559" opacity="0.35" />
+          <ellipse cx="395" cy="98" rx="40" ry="18" fill="#FF8C42" opacity="0.4" />
+
+          <!-- Sticker image replacing SVG characters -->
+          <foreignObject x="180" y="170" width="340" height="130">
+            <a xmlns="http://www.w3.org/1999/xhtml" href="tia.html" target="_blank"
+              style="display:block; width:100%; height:100%; cursor:pointer;">
+              <img src="sticker_sunset.png" alt="Coffee and Sunset together"
+                style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.3));">
+            </a>
+          </foreignObject>
+
+          <!-- Caption -->
+
+        </svg>
+      </div>
+
+      <p class="scene-story">
+        I once believed love would be black and white, but it's golden. just how the kingdom lights shined just for me
+        and
+        you.🌅
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 4: BASANTAPUR DURBAR SQUARE -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="second-date">
+    <!-- ── Photo frames ── -->
+    <div class="scene-photos">
+      <div class="photo-frame frame-polaroid-tl">
+        <img src="13.jpg" alt="Photo 1"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_basantapur_1.jpg</div>
+      </div>
+      <div class="photo-frame frame-polaroid-tr">
+        <img src="14.jpg" alt="Photo 2"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_basantapur_2.jpg</div>
+      </div>
+      <div class="photo-frame frame-circle-br">
+        <img src="15.jpg" alt="Photo 3"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_basantapur_3.jpg</div>
+      </div>
+      <div class="photo-frame frame-blob-bl">
+        <img src="16.jpg" alt="Photo 4"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_basantapur_4.jpg</div>
+      </div>
+    </div>
+    <div class="scene-wrapper">
+      <h2 class="scene-title">Museum Kahile Jaaney?</h2>
+
+      <div class="scene-illustration">
+        <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" class="scene">
+          <defs>
+            <linearGradient id="durbarSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#C8E6F5" />
+              <stop offset="60%" stop-color="#E3F2FD" />
+              <stop offset="100%" stop-color="#EFF9FF" />
+            </linearGradient>
+            <linearGradient id="stoneFloor" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#C4A882" />
+              <stop offset="100%" stop-color="#A89060" />
+            </linearGradient>
+          </defs>
+
+          <!-- Sky -->
+          <rect width="700" height="420" fill="url(#durbarSky)" />
+
+          <!-- Background temples – Basantapur Durbar pagoda style -->
+          <!-- Main Kumari Ghar / big pagoda in center-left -->
+          <g opacity="0.85">
+            <!-- Temple 1 (Taleju style, multi-tiered) center-back -->
+            <rect x="280" y="120" width="80" height="130" fill="#C4A882" rx="2" />
+            <!-- Tier 3 (top) -->
+            <polygon points="290,120 360,120 355,105 295,105" fill="#B09060" />
+            <polygon points="295,105 355,105 350,90 300,90" fill="#A08050" />
+            <polygon points="300,90 350,90 345,76 305,76" fill="#906040" />
+            <!-- Spire -->
+            <polygon points="320,76 320,55 315,76" fill="#806030" />
+            <polygon points="320,76 320,55 325,76" fill="#906040" />
+            <circle cx="320" cy="53" r="5" fill="#C4922A" />
+            <!-- Windows -->
+            <rect x="298" y="128" width="14" height="18" rx="3" fill="#7A5C30" />
+            <rect x="320" y="128" width="14" height="18" rx="3" fill="#7A5C30" />
+            <rect x="342" y="128" width="14" height="18" rx="3" fill="#7A5C30" />
+            <rect x="298" y="155" width="14" height="18" rx="3" fill="#7A5C30" />
+            <rect x="320" y="155" width="14" height="18" rx="3" fill="#7A5C30" />
+            <rect x="342" y="155" width="14" height="18" rx="3" fill="#7A5C30" />
+            <!-- Ornate carvings hint -->
+            <rect x="280" y="119" width="80" height="4" fill="#906040" />
+            <rect x="290" y="104" width="60" height="3" fill="#906040" />
+            <rect x="300" y="89" width="40" height="3" fill="#906040" />
+          </g>
+
+          <!-- Temple 2 (right side) -->
+          <g opacity="0.75">
+            <rect x="480" y="150" width="60" height="110" fill="#C4A882" rx="2" />
+            <polygon points="488,150 540,150 535,137 493,137" fill="#B09060" />
+            <polygon points="493,137 535,137 531,124 497,124" fill="#A08050" />
+            <polygon points="497,124 531,124 527,112 501,112" fill="#906040" />
+            <polygon points="514,112 514,95 510,112" fill="#806030" />
+            <polygon points="514,112 514,95 518,112" fill="#906040" />
+            <circle cx="514" cy="93" r="4" fill="#C4922A" />
+            <rect x="493" y="158" width="11" height="14" rx="2" fill="#7A5C30" />
+            <rect x="510" y="158" width="11" height="14" rx="2" fill="#7A5C30" />
+            <rect x="527" y="158" width="11" height="14" rx="2" fill="#7A5C30" />
+            <rect x="493" y="178" width="11" height="14" rx="2" fill="#7A5C30" />
+            <rect x="510" y="178" width="11" height="14" rx="2" fill="#7A5C30" />
+            <rect x="527" y="178" width="11" height="14" rx="2" fill="#7A5C30" />
+          </g>
+
+          <!-- Temple 3 (left) -->
+          <g opacity="0.7">
+            <rect x="130" y="165" width="55" height="95" fill="#C4A882" rx="2" />
+            <polygon points="137,165 182,165 178,153 141,153" fill="#B09060" />
+            <polygon points="141,153 178,153 174,142 145,142" fill="#A08050" />
+            <polygon points="145,142 174,142 170,131 149,131" fill="#906040" />
+            <polygon points="159,131 159,116 155,131" fill="#806030" />
+            <polygon points="159,131 159,116 163,131" fill="#906040" />
+            <circle cx="159" cy="114" r="3.5" fill="#C4922A" />
+            <rect x="140" y="172" width="10" height="13" rx="2" fill="#7A5C30" />
+            <rect x="157" y="172" width="10" height="13" rx="2" fill="#7A5C30" />
+            <rect x="174" y="172" width="10" height="13" rx="2" fill="#7A5C30" />
+            <rect x="140" y="191" width="10" height="13" rx="2" fill="#7A5C30" />
+            <rect x="157" y="191" width="10" height="13" rx="2" fill="#7A5C30" />
+          </g>
+
+          <!-- Stone courtyard floor -->
+          <rect x="0" y="295" width="700" height="125" fill="url(#stoneFloor)" />
+          <!-- Stone tile lines -->
+          <g stroke="#B09070" stroke-width="0.8" opacity="0.5">
+            <line x1="0" y1="310" x2="700" y2="310" />
+            <line x1="0" y1="325" x2="700" y2="325" />
+            <line x1="0" y1="340" x2="700" y2="340" />
+            <line x1="0" y1="355" x2="700" y2="355" />
+            <line x1="50" y1="295" x2="50" y2="420" />
+            <line x1="100" y1="295" x2="100" y2="420" />
+            <line x1="150" y1="295" x2="150" y2="420" />
+            <line x1="200" y1="295" x2="200" y2="420" />
+            <line x1="250" y1="295" x2="250" y2="420" />
+            <line x1="300" y1="295" x2="300" y2="420" />
+            <line x1="350" y1="295" x2="350" y2="420" />
+            <line x1="400" y1="295" x2="400" y2="420" />
+            <line x1="450" y1="295" x2="450" y2="420" />
+            <line x1="500" y1="295" x2="500" y2="420" />
+            <line x1="550" y1="295" x2="550" y2="420" />
+            <line x1="600" y1="295" x2="600" y2="420" />
+            <line x1="650" y1="295" x2="650" y2="420" />
+          </g>
+
+          <!-- Steps to temple -->
+          <rect x="240" y="258" width="160" height="12" fill="#B8956A" rx="2" />
+          <rect x="250" y="270" width="140" height="12" fill="#C4A070" rx="2" />
+          <rect x="260" y="282" width="120" height="14" fill="#C8A878" rx="2" />
+
+          <!-- Pigeons on steps -->
+          <g fill="#888" opacity="0.7">
+            <ellipse cx="245" cy="272" rx="7" ry="4" />
+            <circle cx="245" cy="268" r="3.5" />
+            <ellipse cx="280" cy="285" rx="7" ry="4" />
+            <circle cx="280" cy="281" r="3.5" />
+            <ellipse cx="420" cy="286" rx="7" ry="4" />
+            <circle cx="420" cy="282" r="3.5" />
+          </g>
+
+          <!-- Clouds -->
+          <ellipse cx="80" cy="55" rx="55" ry="20" fill="white" opacity="0.8" />
+          <ellipse cx="50" cy="50" rx="35" ry="16" fill="white" opacity="0.8" />
+          <ellipse cx="120" cy="52" rx="32" ry="15" fill="white" opacity="0.8" />
+          <ellipse cx="600" cy="65" rx="60" ry="22" fill="white" opacity="0.75" />
+          <ellipse cx="570" cy="60" rx="40" ry="18" fill="white" opacity="0.75" />
+          <ellipse cx="645" cy="63" rx="35" ry="17" fill="white" opacity="0.75" />
+
+          <!-- Marigold flower garlands decorating area -->
+          <path d="M0,280 Q50,275 100,280 Q150,275 200,280" fill="none" stroke="#F4C67B" stroke-width="4"
+            opacity="0.6" />
+          <path d="M500,278 Q550,272 600,278 Q650,272 700,278" fill="none" stroke="#FF8C42" stroke-width="4"
+            opacity="0.6" />
+
+          <!-- Sticker image replacing SVG characters -->
+          <foreignObject x="180" y="180" width="340" height="200">
+            <img xmlns="http://www.w3.org/1999/xhtml" src="sticker_kiss.png" alt="The Cheek Kiss at Basantapur"
+              style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.25));">
+          </foreignObject>
+        </svg>
+      </div>
+
+      <p class="scene-story">
+        I cherish your life more than mine, now.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 5: KAMALPOKHARI — The Night Dance -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section id="night-date">
+    <!-- Stars -->
+    <div id="stars-container" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
+    <!-- Fireflies -->
+    <div id="firefly-container" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
+
+    <!-- ── Photo frames ── -->
+    <div class="scene-photos">
+      <div class="photo-frame frame-polaroid-tl">
+        <img src="17.jpg" alt="Photo 1"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_night_1.jpg</div>
+      </div>
+      <div class="photo-frame frame-polaroid-tr">
+        <img src="18.jpg" alt="Photo 2"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_night_2.jpg</div>
+      </div>
+      <div class="photo-frame frame-circle-br">
+        <img src="19.jpg" alt="Photo 3"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_night_3.jpg</div>
+      </div>
+      <div class="photo-frame frame-blob-bl">
+        <img src="20.jpg" alt="Photo 4"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="photo-hint" style="display:none"><span>🖼️</span>photo_night_4.jpg</div>
+      </div>
+    </div>
+
+    <div class="scene-wrapper">
+      <h2 class="scene-title" style="color:#AED6F1">PDA</h2>
+
+      <div class="scene-illustration">
+        <svg viewBox="0 0 700 430" xmlns="http://www.w3.org/2000/svg" class="scene">
+          <defs>
+            <linearGradient id="nightSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#060B18" />
+              <stop offset="40%" stop-color="#0D1B2A" />
+              <stop offset="70%" stop-color="#0F2540" />
+              <stop offset="100%" stop-color="#0F3460" />
+            </linearGradient>
+            <linearGradient id="pondGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0A2240" />
+              <stop offset="50%" stop-color="#0D2E55" />
+              <stop offset="100%" stop-color="#0A2240" />
+            </linearGradient>
+            <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FEFEFE" />
+              <stop offset="40%" stop-color="#F8F8E8" />
+              <stop offset="100%" stop-color="#E8D88A" stop-opacity="0" />
+            </radialGradient>
+            <filter id="softGlow">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="strongGlow">
+              <feGaussianBlur stdDeviation="5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <linearGradient id="pagodaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2C2010" />
+              <stop offset="100%" stop-color="#1A1208" />
+            </linearGradient>
+          </defs>
+
+          <!-- Night sky -->
+          <rect width="700" height="430" fill="url(#nightSky)" />
+
+          <!-- Stars scattered -->
+          <g fill="white">
+            <circle cx="30" cy="20" r="1.2" opacity="0.9" />
+            <circle cx="75" cy="35" r="0.8" opacity="0.7" />
+            <circle cx="120" cy="15" r="1.5" opacity="0.85" />
+            <circle cx="165" cy="40" r="0.7" opacity="0.6" />
+            <circle cx="210" cy="18" r="1.2" opacity="0.9" />
+            <circle cx="250" cy="30" r="0.9" opacity="0.75" />
+            <circle cx="295" cy="10" r="1.4" opacity="0.8" />
+            <circle cx="340" cy="28" r="0.8" opacity="0.65" />
+            <circle cx="390" cy="12" r="1.3" opacity="0.85" />
+            <circle cx="440" cy="22" r="0.9" opacity="0.7" />
+            <circle cx="490" cy="38" r="1.1" opacity="0.8" />
+            <circle cx="535" cy="15" r="0.8" opacity="0.65" />
+            <circle cx="580" cy="30" r="1.4" opacity="0.9" />
+            <circle cx="625" cy="20" r="0.7" opacity="0.7" />
+            <circle cx="670" cy="35" r="1.2" opacity="0.8" />
+            <circle cx="55" cy="65" r="1.0" opacity="0.7" />
+            <circle cx="100" cy="55" r="0.7" opacity="0.6" />
+            <circle cx="148" cy="70" r="1.2" opacity="0.75" />
+            <circle cx="200" cy="58" r="0.8" opacity="0.65" />
+            <circle cx="445" cy="65" r="1.0" opacity="0.7" />
+            <circle cx="495" cy="55" r="0.8" opacity="0.65" />
+            <circle cx="545" cy="68" r="1.1" opacity="0.75" />
+            <circle cx="595" cy="52" r="0.7" opacity="0.6" />
+            <circle cx="645" cy="62" r="1.3" opacity="0.8" />
+            <circle cx="688" cy="48" r="0.9" opacity="0.7" />
+          </g>
+
+          <!-- Moon -->
+          <circle cx="600" cy="60" r="32" fill="url(#moonGlow)" opacity="0.25" filter="url(#strongGlow)" />
+          <circle cx="600" cy="60" r="22" fill="#FEFEFE" filter="url(#softGlow)" />
+          <circle cx="600" cy="60" r="20" fill="#F8F8E8" />
+          <!-- Moon craters -->
+          <circle cx="594" cy="54" r="3" fill="#E8E8D0" opacity="0.4" />
+          <circle cx="607" cy="65" r="2" fill="#E8E8D0" opacity="0.3" />
+          <circle cx="600" cy="68" r="1.5" fill="#E8E8D0" opacity="0.3" />
+
+          <!-- Moon reflection in pond -->
+          <ellipse cx="350" cy="355" rx="18" ry="8" fill="#F8F8E8" opacity="0.25" filter="url(#softGlow)" />
+
+          <!-- Distant city lights (Kathmandu at night) -->
+          <g opacity="0.5">
+            <rect x="0" y="200" width="700" height="100" fill="none" />
+            <!-- Building silhouettes -->
+            <rect x="20" y="195" width="30" height="80" fill="#0A1520" />
+            <rect x="55" y="205" width="25" height="70" fill="#0A1520" />
+            <rect x="85" y="185" width="35" height="90" fill="#0A1520" />
+            <rect x="125" y="200" width="28" height="75" fill="#0A1520" />
+            <rect x="158" y="190" width="32" height="85" fill="#0A1520" />
+            <rect x="555" y="195" width="30" height="80" fill="#0A1520" />
+            <rect x="590" y="205" width="25" height="70" fill="#0A1520" />
+            <rect x="620" y="188" width="35" height="87" fill="#0A1520" />
+            <rect x="660" y="200" width="28" height="75" fill="#0A1520" />
+            <!-- Tiny glowing windows -->
+            <g fill="#FFD700" opacity="0.6">
+              <rect x="23" y="200" width="4" height="3" rx="0.5" />
+              <rect x="30" y="205" width="4" height="3" rx="0.5" />
+              <rect x="23" y="210" width="4" height="3" rx="0.5" />
+              <rect x="30" y="215" width="4" height="3" rx="0.5" />
+              <rect x="88" y="192" width="4" height="3" rx="0.5" />
+              <rect x="96" y="198" width="4" height="3" rx="0.5" />
+              <rect x="88" y="205" width="4" height="3" rx="0.5" />
+              <rect x="96" y="212" width="4" height="3" rx="0.5" />
+              <rect x="560" y="200" width="4" height="3" rx="0.5" />
+              <rect x="568" y="207" width="4" height="3" rx="0.5" />
+              <rect x="560" y="214" width="4" height="3" rx="0.5" />
+              <rect x="624" y="195" width="4" height="3" rx="0.5" />
+              <rect x="632" y="202" width="4" height="3" rx="0.5" />
+              <rect x="624" y="209" width="4" height="3" rx="0.5" />
+              <rect x="663" y="205" width="4" height="3" rx="0.5" />
+              <rect x="670" y="210" width="4" height="3" rx="0.5" />
+            </g>
+            <!-- Warm glow above city -->
+            <ellipse cx="350" cy="285" rx="300" ry="30" fill="#C87A20" opacity="0.12" />
+          </g>
+
+          <!-- Kamalpokhari Pond -->
+          <ellipse cx="350" cy="350" rx="280" ry="55" fill="url(#pondGrad)" />
+          <!-- Pond shimmer ripples -->
+          <ellipse cx="350" cy="348" rx="260" ry="45" fill="none" stroke="#1A4A7A" stroke-width="1.5" opacity="0.5" />
+          <ellipse cx="350" cy="348" rx="220" ry="35" fill="none" stroke="#1E5080" stroke-width="1" opacity="0.4" />
+          <ellipse cx="350" cy="350" rx="170" ry="25" fill="none" stroke="#2060A0" stroke-width="0.8" opacity="0.35" />
+          <!-- Pond glimmer dots -->
+          <g opacity="0.7">
+            <circle cx="280" cy="340" r="1.5" fill="#6DB5D4" />
+            <circle cx="320" cy="355" r="1" fill="#6DB5D4" />
+            <circle cx="370" cy="342" r="1.5" fill="#90CAE8" />
+            <circle cx="410" cy="358" r="1" fill="#6DB5D4" />
+            <circle cx="450" cy="345" r="1.5" fill="#6DB5D4" />
+            <circle cx="240" cy="358" r="1" fill="#5AAAC0" />
+            <circle cx="490" cy="355" r="1" fill="#5AAAC0" />
+            <circle cx="350" cy="365" r="2" fill="#A0D8EF" filter="url(#softGlow)" />
+            <circle cx="390" cy="360" r="1.5" fill="#90CAE8" />
+            <circle cx="310" cy="362" r="1.5" fill="#90CAE8" />
+          </g>
+          <!-- City light reflection in water -->
+          <g opacity="0.2">
+            <rect x="100" y="345" width="3" height="15" fill="#FFD700" />
+            <rect x="160" y="340" width="2" height="20" fill="#FFD700" />
+            <rect x="540" y="340" width="3" height="20" fill="#FFD700" />
+            <rect x="580" y="345" width="2" height="15" fill="#FFD700" />
+          </g>
+
+          <!-- Ground/path around pond -->
+          <path d="M0,295 Q180,275 350,290 Q520,275 700,295 L700,420 L0,420Z" fill="#0C1A2A" />
+
+          <!-- ══ PAGODA / HUT structure (foreground, where they are) ══ -->
+          <!-- Pagoda base platform -->
+          <rect x="230" y="258" width="240" height="12" fill="#1E120A" rx="2" />
+          <!-- Pagoda floor -->
+          <rect x="240" y="245" width="220" height="15" fill="#2A1A0E" rx="2" />
+          <!-- Pagoda tier 1 roof (bottom) -->
+          <polygon points="220,245 480,245 470,228 230,228" fill="#1A0F08" />
+          <polygon points="225,245 475,245 465,230 235,230" fill="#241408" />
+          <!-- Decorative eave tip at tier 1 -->
+          <line x1="220" y1="245" x2="205" y2="235" stroke="#3A2010" stroke-width="3" />
+          <line x1="480" y1="245" x2="495" y2="235" stroke="#3A2010" stroke-width="3" />
+          <circle cx="204" cy="234" r="3" fill="#C4922A" />
+          <circle cx="496" cy="234" r="3" fill="#C4922A" />
+          <!-- Pagoda tier 2 -->
+          <rect x="270" y="210" width="160" height="18" fill="#2A1A0E" rx="2" />
+          <polygon points="255,210 445,210 435,196 265,196" fill="#1A0F08" />
+          <polygon points="258,210 442,210 432,198 268,198" fill="#241408" />
+          <line x1="255" y1="210" x2="243" y2="202" stroke="#3A2010" stroke-width="2.5" />
+          <line x1="445" y1="210" x2="457" y2="202" stroke="#3A2010" stroke-width="2.5" />
+          <circle cx="242" cy="201" r="2.5" fill="#C4922A" />
+          <circle cx="458" cy="201" r="2.5" fill="#C4922A" />
+          <!-- Pagoda tier 3 (top) -->
+          <rect x="305" y="178" width="90" height="18" fill="#2A1A0E" rx="2" />
+          <polygon points="295,178 405,178 398,165 302,165" fill="#1A0F08" />
+          <polygon points="298,178 402,178 395,167 305,167" fill="#241408" />
+          <!-- Spire -->
+          <rect x="345" y="148" width="10" height="20" fill="#3A2010" />
+          <polygon points="350,138 343,148 357,148" fill="#C4922A" />
+          <!-- Lanterns hanging from pagoda eaves -->
+          <circle cx="240" cy="240" r="5" fill="#FF6B35" opacity="0.85" filter="url(#softGlow)" />
+          <circle cx="460" cy="240" r="5" fill="#FF6B35" opacity="0.85" filter="url(#softGlow)" />
+          <circle cx="280" cy="225" r="4" fill="#FFD700" opacity="0.8" filter="url(#softGlow)" />
+          <circle cx="420" cy="225" r="4" fill="#FFD700" opacity="0.8" filter="url(#softGlow)" />
+          <circle cx="310" cy="208" r="3.5" fill="#FF6B35" opacity="0.8" filter="url(#softGlow)" />
+          <circle cx="390" cy="208" r="3.5" fill="#FF6B35" opacity="0.8" filter="url(#softGlow)" />
+          <!-- Lantern strings -->
+          <line x1="240" y1="228" x2="240" y2="235" stroke="#8B6040" stroke-width="0.8" />
+          <line x1="460" y1="228" x2="460" y2="235" stroke="#8B6040" stroke-width="0.8" />
+          <!-- Warm light from pagoda interior -->
+          <ellipse cx="350" cy="255" rx="100" ry="15" fill="#C87A20" opacity="0.15" filter="url(#softGlow)" />
+
+          <!-- Pillars of pagoda -->
+          <rect x="248" y="245" width="8" height="13" fill="#1C1008" />
+          <rect x="346" y="245" width="8" height="13" fill="#1C1008" />
+          <rect x="444" y="245" width="8" height="13" fill="#1C1008" />
+
+          <!-- Sticker image replacing SVG characters -->
+          <foreignObject x="180" y="130" width="340" height="150">
+            <a xmlns="http://www.w3.org/1999/xhtml" href="kml.html" target="_blank"
+              style="display:block;width:100%;height:100%;cursor:pointer;text-decoration:none;">
+              <img src="sticker_night.png" alt="Night embrace at Kamalpokhari"
+                style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 0 20px rgba(232,117,138,0.4));">
+            </a>
+          </foreignObject>
+
+          <!-- Musical notes floating (music in distance) -->
+          <text x="430" y="175" font-size="18" fill="white" opacity="0.5" filter="url(#softGlow)">♪</text>
+          <text x="410" y="155" font-size="14" fill="white" opacity="0.4" filter="url(#softGlow)">♫</text>
+          <text x="455" y="158" font-size="11" fill="white" opacity="0.35" filter="url(#softGlow)">♩</text>
+          <text x="252" y="170" font-size="14" fill="white" opacity="0.4" filter="url(#softGlow)">♪</text>
+          <text x="268" y="155" font-size="11" fill="white" opacity="0.35" filter="url(#softGlow)">♫</text>
+
+          <!-- Heart above them -->
+          <text x="348" y="125" font-size="20" fill="#E8758A" filter="url(#strongGlow)" opacity="0.9">💗</text>
+
+        </svg>
+      </div>
+
+      <p class="scene-story" style="color:#D6EAF8">
+        You, my muse, swayed me more than the music did. Your warmth against the sharp
+        piercing gusts of wind. Your starry eyes sparking up the dark night. Did you teach the night?
+        to be that flawless?
+      </p>
+    </div>
+  </section>
+
+  <script>
+    // ── Stars for night section ──
+    const starsContainer = document.getElementById('stars-container');
+    const nightSection = document.getElementById('night-date');
+    // Stars only visible in night section area
+    for (let i = 0; i < 60; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 3 + 1;
+      star.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random() * 100}%;
+    top:${Math.random() * 50}%;
+    animation-duration:${2 + Math.random() * 3}s;
+    animation-delay:${Math.random() * 4}s;
+  `;
+      starsContainer.appendChild(star);
+    }
+
+
+
+    // ── Scroll-based section reveals ──
+    const sections = document.querySelectorAll('section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.scene-wrapper, .title-content').forEach(el => {
+            el.style.animation = 'fadeUp .7s ease both';
+          });
+        }
+      });
+    }, { threshold: 0.1 });
+    sections.forEach(s => observer.observe(s));
+    // ── Spotify Player (IFrame API) ──
+    const SPOTIFY_TRACK_URI = 'spotify:track:1dGr1c8CrMLDpV6mPbImSI';
+    const spotifyPlayerEl = document.getElementById('spotifyPlayer');
+    const spotifyToggle = document.getElementById('spotifyToggle');
+    let playerOpen = false;
+    let spotifyController = null;
+
+    // Spotify IFrame API callback — create controller immediately
+    window.onSpotifyIframeApiReady = (IFrameAPI) => {
+      const element = document.getElementById('spotifyEmbedTarget');
+      const options = {
+        uri: SPOTIFY_TRACK_URI,
+        width: 300,
+        height: 380,
+        theme: 0
+      };
+      IFrameAPI.createController(element, options, (controller) => {
+        spotifyController = controller;
+        controller.addListener('ready', () => {
+          // Try to play immediately (works if user already interacted)
+          controller.play();
+        });
+      });
+    };
+
+    // Browsers block autoplay until user interacts — retry play on first interaction
+    let hasInteracted = false;
+    function onFirstInteraction() {
+      if (hasInteracted) return;
+      hasInteracted = true;
+      if (spotifyController) {
+        spotifyController.play();
+      }
+      // Clean up listeners
+      ['click', 'scroll', 'touchstart', 'keydown'].forEach(evt =>
+        document.removeEventListener(evt, onFirstInteraction, { capture: true })
+      );
+    }
+    ['click', 'scroll', 'touchstart', 'keydown'].forEach(evt =>
+      document.addEventListener(evt, onFirstInteraction, { capture: true, once: false })
+    );
+
+    // Toggle player visibility
+    spotifyToggle.addEventListener('click', () => {
+      playerOpen = !playerOpen;
+      if (playerOpen) {
+        spotifyPlayerEl.classList.remove('hidden');
+        spotifyPlayerEl.classList.add('visible');
+        spotifyToggle.textContent = '\ud83c\udfb6';
+      } else {
+        spotifyPlayerEl.classList.remove('visible');
+        spotifyPlayerEl.classList.add('hidden');
+        spotifyToggle.textContent = '\ud83c\udfb5';
+      }
+    });
+  </script>
+</body>
+
+</html>

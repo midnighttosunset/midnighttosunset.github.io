@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunset, my Sunset</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow: hidden;
+      background: #1a0e05;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #crosshair {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 3px;
+      height: 3px;
+      background: rgba(255, 220, 160, 0.2);
+      border-radius: 50%;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    #controls-hint {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(220, 180, 120, 0.35);
+      font-family: 'Consolas', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    /* Hide Spotify behind canvas */
+    #spotify-container,
+    #spotify-container iframe,
+    iframe[src*="spotify"] {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      width: 300px !important;
+      height: 80px !important;
+      z-index: -10 !important;
+      pointer-events: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="crosshair"></div>
+
+  <!-- Hidden Spotify embed -->
+  <div id="spotify-container"
+    style="position:fixed;bottom:0;left:0;width:300px;height:80px;z-index:-10;pointer-events:none;">
+  </div>
+  <script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+    // ╔═══════════════════════════════════════════════════════════╗
+    // ║  🎵 Change the track URI below to your own music        ║
+    // ╚═══════════════════════════════════════════════════════════╝
+    const SPOTIFY_URI = 'spotify:track:44AyOl4qVkzS48vBsbNXaC';
+
+    // ── Config ──
+    const GY = 5.0;   // elevated platform height
+    const PH = GY + 1.75; // eye height
+    const SPD = 4.0;
+
+    // ══════════════════════════════════════════════════════════════
+    // RENDERER
+    // ══════════════════════════════════════════════════════════════
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    document.body.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    // Warm sunset gradient via fog
+    scene.background = new THREE.Color(0x1a0e08);
+    scene.fog = new THREE.Fog(0x2a1508, 100, 350);
+
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 500);
+    // Start on the elevated viewing platform, facing the runway/sunset
+    camera.position.set(0, PH, 0);
+
+    const clock = new THREE.Clock();
+
+    // ══════════════════════════════════════════════════════════════
+    // CONTROLS
+    // ══════════════════════════════════════════════════════════════
+    const controls = new PointerLockControls(camera, document.body);
+    scene.add(controls.getObject());
+    const keys = {};
+    document.addEventListener('keydown', e => keys[e.code] = true);
+    document.addEventListener('keyup', e => keys[e.code] = false);
+
+    // ── Spotify music ──
+    let isPlaying = false;
+    let spotifyController = null;
+
+    window.onSpotifyIframeApiReady = (IFrameAPI) => {
+      const el = document.getElementById('spotify-container');
+      IFrameAPI.createController(el, {
+        uri: SPOTIFY_URI,
+        width: 300,
+        height: 80,
+      }, (controller) => {
+        spotifyController = controller;
+        
+        controller.addListener('ready', () => {
+          // Attempt to autoplay immediately on load
+          controller.play();
+        });
+
+        // Track actual playing state to prevent accidental pauses on click
+        controller.addListener('playback_update', e => {
+          if (e.data) {
+            isPlaying = !e.data.isPaused;
+          }
+        });
+      });
+    };
+
+    function startMusic() {
+      if (isPlaying) return;
+      if (spotifyController) spotifyController.play();
+    }
+
+    renderer.domElement.addEventListener('click', () => {
+      if (!controls.isLocked) {
+        controls.lock();
+        startMusic();
+      }
+    });
+    controls.addEventListener('lock', () => startMusic());
+
+    // ══════════════════════════════════════════════════════════════
+    // SUNSET SKY — gradient sphere
+    // ══════════════════════════════════════════════════════════════
+    const skyVert = `
+      varying vec3 vWorldPos;
+      void main() {
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vWorldPos = wp.xyz;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }`;
+    const skyFrag = `
+      varying vec3 vWorldPos;
+      void main() {
+        vec3 dir = normalize(vWorldPos);
+        float h = dir.y;
+
+        // Horizon gradient: deep orange at bottom → golden → pale peach → soft blue up top
+        vec3 deep   = vec3(0.55, 0.12, 0.03);   // deep red-orange horizon
+        vec3 orange = vec3(0.92, 0.45, 0.08);    // vivid orange
+        vec3 gold   = vec3(1.0, 0.72, 0.22);     // golden
+        vec3 peach  = vec3(1.0, 0.85, 0.65);     // warm peach
+        vec3 pale   = vec3(0.65, 0.78, 0.95);    // pale blue
+        vec3 blue   = vec3(0.18, 0.28, 0.55);    // upper sky
+
+        vec3 col;
+        if (h < -0.02) {
+          col = deep;
+        } else if (h < 0.04) {
+          col = mix(deep, orange, (h + 0.02) / 0.06);
+        } else if (h < 0.1) {
+          col = mix(orange, gold, (h - 0.04) / 0.06);
+        } else if (h < 0.2) {
+          col = mix(gold, peach, (h - 0.1) / 0.1);
+        } else if (h < 0.45) {
+          col = mix(peach, pale, (h - 0.2) / 0.25);
+        } else {
+          col = mix(pale, blue, (h - 0.45) / 0.55);
+        }
+
+        // Sun disc (on the horizon, slightly left)
+        vec3 sunDir = normalize(vec3(-0.4, 0.03, -1.0));
+        float sunDot = max(dot(dir, sunDir), 0.0);
+        // Intense core
+        float sunCore = pow(sunDot, 400.0) * 3.0;
+        // Warm glow halo
+        float sunGlow = pow(sunDot, 20.0) * 0.8;
+        float sunHaze = pow(sunDot, 5.0) * 0.25;
+        col += vec3(1.0, 0.95, 0.7) * sunCore;
+        col += vec3(1.0, 0.6, 0.15) * sunGlow;
+        col += vec3(0.9, 0.5, 0.1) * sunHaze;
+
+        gl_FragColor = vec4(col, 1.0);
+      }`;
+
+    const skyGeo = new THREE.SphereGeometry(300, 20, 12);
+    const skyMat = new THREE.ShaderMaterial({
+      vertexShader: skyVert,
+      fragmentShader: skyFrag,
+      side: THREE.BackSide,
+      depthWrite: false
+    });
+    scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+    // ══════════════════════════════════════════════════════════════
+    // LIGHTING — golden hour
+    // ══════════════════════════════════════════════════════════════
+    // Warm ambient
+    scene.add(new THREE.AmbientLight(0x8a6535, 1.0));
+
+    // Hemisphere: warm sky → dark ground
+    scene.add(new THREE.HemisphereLight(0xffa855, 0x201008, 0.8));
+
+    // Sun directional — golden, from horizon
+    const sunLight = new THREE.DirectionalLight(0xffc060, 2.5);
+    sunLight.position.set(-60, 15, -120);
+    scene.add(sunLight);
+
+    // Fill from opposite
+    const fillLight = new THREE.DirectionalLight(0x4a5570, 0.3);
+    fillLight.position.set(40, 30, 80);
+    scene.add(fillLight);
+
+    // ══════════════════════════════════════════════════════════════
+    // TEXTURES
+    // ══════════════════════════════════════════════════════════════
+    function makeTex(w, h, draw) {
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      draw(c.getContext('2d'), w, h);
+      const t = new THREE.CanvasTexture(c);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      return t;
+    }
+
+    // Concrete platform
+    const concreteTex = makeTex(256, 256, (ctx, w, h) => {
+      ctx.fillStyle = '#5a5550';
+      ctx.fillRect(0, 0, w, h);
+      for (let i = 0; i < 800; i++) {
+        const v = 70 + Math.random() * 30;
+        ctx.fillStyle = `rgba(${v},${v - 2},${v - 5},0.15)`;
+        ctx.fillRect(Math.random() * w, Math.random() * h, 2 + Math.random() * 4, 1 + Math.random() * 3);
+      }
+      // Joints
+      ctx.strokeStyle = 'rgba(40,38,35,0.3)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 64) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+      for (let y = 0; y < h; y += 64) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    });
+    concreteTex.repeat.set(6, 6);
+
+    // Road asphalt
+    const asphaltTex = makeTex(256, 256, (ctx, w, h) => {
+      ctx.fillStyle = '#2a2828';
+      ctx.fillRect(0, 0, w, h);
+      for (let i = 0; i < 1000; i++) {
+        const v = 30 + Math.random() * 20;
+        ctx.fillStyle = `rgba(${v},${v},${v},0.2)`;
+        ctx.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 3, 1 + Math.random() * 2);
+      }
+    });
+    asphaltTex.repeat.set(8, 8);
+
+    // Building/shop texture
+    const shopTex = makeTex(256, 256, (ctx, w, h) => {
+      ctx.fillStyle = '#4a3a28';
+      ctx.fillRect(0, 0, w, h);
+      // Window panes
+      const cols = 3, rows = 2;
+      const ww = w * 0.22, wh = h * 0.28;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const wx = w * 0.1 + c * (w * 0.28);
+          const wy = h * 0.12 + r * (h * 0.45);
+          ctx.fillStyle = 'rgba(220, 180, 100, 0.25)';
+          ctx.fillRect(wx, wy, ww, wh);
+          ctx.strokeStyle = 'rgba(80, 60, 40, 0.4)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(wx, wy, ww, wh);
+          // Cross mullion
+          ctx.beginPath();
+          ctx.moveTo(wx + ww / 2, wy); ctx.lineTo(wx + ww / 2, wy + wh);
+          ctx.moveTo(wx, wy + wh / 2); ctx.lineTo(wx + ww, wy + wh / 2);
+          ctx.stroke();
+        }
+      }
+    });
+
+    // Grass
+    const grassTex = makeTex(128, 128, (ctx, w, h) => {
+      ctx.fillStyle = '#1a3010';
+      ctx.fillRect(0, 0, w, h);
+      for (let i = 0; i < 400; i++) {
+        const v = 25 + Math.random() * 25;
+        ctx.fillStyle = `rgb(${v - 5},${v + 10},${v - 10})`;
+        ctx.fillRect(Math.random() * w, Math.random() * h, 1, 2 + Math.random() * 3);
+      }
+    });
+    grassTex.repeat.set(20, 20);
+
+    // ══════════════════════════════════════════════════════════════
+    // GROUND — below the platform (concrete + runway area)
+    // ══════════════════════════════════════════════════════════════
+    const groundMat = new THREE.MeshLambertMaterial({ map: concreteTex });
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2), groundMat);
+    ground.position.y = 0;
+    scene.add(ground);
+
+    // Runway (in the distance, toward sunset)
+    const runwayMat = new THREE.MeshLambertMaterial({ map: asphaltTex });
+    const runway = new THREE.Mesh(new THREE.PlaneGeometry(15, 250).rotateX(-Math.PI / 2), runwayMat);
+    runway.position.set(-20, 0.05, -100);
+    scene.add(runway);
+
+    // Runway center markings
+    const markMat = new THREE.MeshLambertMaterial({ color: 0x888880 });
+    for (let i = 0; i < 20; i++) {
+      const mark = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 5).rotateX(-Math.PI / 2), markMat);
+      mark.position.set(-20, 0.08, -220 + i * 12);
+      scene.add(mark);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ELEVATED PLATFORM (viewpoint)
+    // ══════════════════════════════════════════════════════════════
+    const platMat = new THREE.MeshLambertMaterial({ map: concreteTex });
+
+    // Main platform slab
+    const platGeo = new THREE.BoxGeometry(20, 0.4, 16);
+    const plat = new THREE.Mesh(platGeo, platMat);
+    plat.position.set(0, GY, 0);
+    scene.add(plat);
+
+    // Support pillars underneath
+    const pillarMat = new THREE.MeshLambertMaterial({ color: 0x4a4540 });
+    const pillarGeo = new THREE.CylinderGeometry(0.3, 0.35, GY, 6);
+    [[-8, -6], [-8, 6], [8, -6], [8, 6], [0, -6], [0, 6]].forEach(([x, z]) => {
+      const p = new THREE.Mesh(pillarGeo, pillarMat);
+      p.position.set(x, GY / 2, z);
+      scene.add(p);
+    });
+
+    // Extended walkway
+    const walkway = new THREE.Mesh(new THREE.BoxGeometry(30, 0.35, 4), platMat);
+    walkway.position.set(0, GY, 10);
+    scene.add(walkway);
+
+    // Steps down from walkway
+    for (let i = 0; i < 10; i++) {
+      const step = new THREE.Mesh(new THREE.BoxGeometry(4, 0.3, 1), platMat);
+      step.position.set(12, GY - i * 0.5, 10 + i * 1.2);
+      scene.add(step);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // RAILINGS — metal along platform edges
+    // ══════════════════════════════════════════════════════════════
+    const railMat = new THREE.MeshLambertMaterial({ color: 0x5a4a38 });
+
+    function addRailing(startX, startZ, endX, endZ, posts) {
+      const dx = (endX - startX) / posts;
+      const dz = (endZ - startZ) / posts;
+      for (let i = 0; i <= posts; i++) {
+        const x = startX + dx * i;
+        const z = startZ + dz * i;
+        // Vertical post
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.1, 4), railMat);
+        post.position.set(x, GY + 0.75, z);
+        scene.add(post);
+      }
+      // Top rail
+      const len = Math.sqrt((endX - startX) ** 2 + (endZ - startZ) ** 2);
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, len, 4), railMat);
+      rail.position.set((startX + endX) / 2, GY + 1.2, (startZ + endZ) / 2);
+      rail.rotation.z = Math.PI / 2;
+      const angle = Math.atan2(endZ - startZ, endX - startX);
+      rail.rotation.y = -angle;
+      scene.add(rail);
+      // Mid rail
+      const midRail = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, len, 4), railMat);
+      midRail.position.set((startX + endX) / 2, GY + 0.65, (startZ + endZ) / 2);
+      midRail.rotation.z = Math.PI / 2;
+      midRail.rotation.y = -angle;
+      scene.add(midRail);
+    }
+
+    // Front railing (facing runway/sunset)
+    addRailing(-10, -8, 10, -8, 14);
+    // Left side
+    addRailing(-10, -8, -10, 8, 12);
+    // Right side
+    addRailing(10, -8, 10, 8, 12);
+    // Back partial (gap for walkway entrance)
+    addRailing(-10, 8, -5, 8, 4);
+    addRailing(5, 8, 10, 8, 4);
+
+    // ══════════════════════════════════════════════════════════════
+    // ROAD nearby (below, parallel to runway)
+    // ══════════════════════════════════════════════════════════════
+    const road = new THREE.Mesh(new THREE.PlaneGeometry(8, 200).rotateX(-Math.PI / 2), runwayMat);
+    road.position.set(25, 0.06, -30);
+    scene.add(road);
+
+    // Road curb
+    const curbMat = new THREE.MeshLambertMaterial({ color: 0x555550 });
+    const curb1 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 200), curbMat);
+    curb1.position.set(21, 0.1, -30);
+    scene.add(curb1);
+    const curb2 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 200), curbMat);
+    curb2.position.set(29, 0.1, -30);
+    scene.add(curb2);
+
+    // ══════════════════════════════════════════════════════════════
+    // SHOPS / COFFEE SHOP — placed at SW 220° from platform
+    // ══════════════════════════════════════════════════════════════
+    // 220° compass → x = sin(220°)*dist ≈ -0.643, z = -cos(220°)*dist ≈ +0.766
+    const CAFE_X = -30, CAFE_Z = -20;
+    const CAFE_ROT = Math.PI * 0.75; // face back toward platform (NE)
+
+    // Coffee shop wall texture
+    const coffeeWallTex = makeTex(256, 256, (ctx, w, h) => {
+      ctx.fillStyle = '#6a5540';
+      ctx.fillRect(0, 0, w, h);
+      for (let row = 0; row < h / 8; row++) {
+        const off = (row % 2) * 12;
+        for (let col = -1; col < w / 24 + 2; col++) {
+          const v = 80 + Math.random() * 25;
+          ctx.fillStyle = `rgb(${v + 10},${v - 5},${v - 20})`;
+          ctx.fillRect(col * 24 + off + 1, row * 8 + 1, 22, 6);
+        }
+      }
+      // Large warm windows
+      ctx.fillStyle = 'rgba(255, 200, 100, 0.5)';
+      ctx.fillRect(w * 0.05, h * 0.35, w * 0.4, h * 0.45);
+      ctx.fillRect(w * 0.55, h * 0.35, w * 0.4, h * 0.45);
+      ctx.strokeStyle = '#3a2a18';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(w * 0.05, h * 0.35, w * 0.4, h * 0.45);
+      ctx.strokeRect(w * 0.55, h * 0.35, w * 0.4, h * 0.45);
+    });
+
+    const cafeGroup = new THREE.Group();
+    cafeGroup.position.set(CAFE_X, 0, CAFE_Z);
+    cafeGroup.rotation.y = CAFE_ROT;
+
+    const coffeeShopMat = new THREE.MeshLambertMaterial({ map: coffeeWallTex });
+    const roofMat = new THREE.MeshLambertMaterial({ color: 0x5a3020 });
+
+    // Shop body
+    const shop1 = new THREE.Mesh(new THREE.BoxGeometry(10, 4, 7), coffeeShopMat);
+    shop1.position.set(0, 2, 0);
+    cafeGroup.add(shop1);
+
+    // Roof
+    const roof1 = new THREE.Mesh(new THREE.BoxGeometry(11.5, 0.25, 8.5), roofMat);
+    roof1.position.set(0, 4.15, 0);
+    cafeGroup.add(roof1);
+
+    // Awning
+    const awningMat = new THREE.MeshLambertMaterial({ color: 0xa83828, side: THREE.DoubleSide });
+    const awning = new THREE.Mesh(new THREE.PlaneGeometry(10, 2.5).rotateX(-0.3), awningMat);
+    awning.position.set(0, 3.6, -4.2);
+    cafeGroup.add(awning);
+
+    // ── "ARABICA COFFEE" sign — just bold text, brightly lit ──
+    const signCanvas = document.createElement('canvas');
+    signCanvas.width = 512;
+    signCanvas.height = 96;
+    const sCtx = signCanvas.getContext('2d');
+    // Transparent-ish dark background
+    sCtx.fillStyle = '#0a0604';
+    sCtx.fillRect(0, 0, 512, 96);
+    // Bold text only
+    sCtx.fillStyle = '#ffe090';
+    sCtx.font = 'bold 60px Arial, Helvetica, sans-serif';
+    sCtx.textAlign = 'center';
+    sCtx.textBaseline = 'middle';
+    sCtx.fillText('ARABICA COFFEE', 256, 48);
+
+    const signTex = new THREE.CanvasTexture(signCanvas);
+    const signBoardMat = new THREE.MeshLambertMaterial({
+      map: signTex,
+      emissive: 0xffcc60,
+      emissiveIntensity: 1.5,
+      emissiveMap: signTex
+    });
+    const signBoard = new THREE.Mesh(new THREE.BoxGeometry(6, 1.2, 0.1), signBoardMat);
+    signBoard.position.set(0, 4.8, -3.6);
+    cafeGroup.add(signBoard);
+
+    // Concrete patio
+    const patioMat = new THREE.MeshLambertMaterial({ color: 0x5a5550 });
+    const patio = new THREE.Mesh(new THREE.BoxGeometry(14, 0.1, 8), patioMat);
+    patio.position.set(0, 0.05, -8);
+    cafeGroup.add(patio);
+
+    // ── Outdoor tables & chairs ──
+    const tableMat = new THREE.MeshLambertMaterial({ color: 0x4a3a28 });
+    const chairMat = new THREE.MeshLambertMaterial({ color: 0x3a2a1a });
+    const tableGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.05, 8);
+    const legGeo = new THREE.CylinderGeometry(0.04, 0.05, 0.75, 4);
+    const chairSeatGeo = new THREE.BoxGeometry(0.5, 0.05, 0.5);
+    const chairBackGeo = new THREE.BoxGeometry(0.5, 0.5, 0.05);
+    const chairLegGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.45, 4);
+
+    function addCafeTable(tx, tz) {
+      // Table top
+      const top = new THREE.Mesh(tableGeo, tableMat);
+      top.position.set(tx, 0.78, tz);
+      cafeGroup.add(top);
+      // Table leg
+      const leg = new THREE.Mesh(legGeo, tableMat);
+      leg.position.set(tx, 0.38, tz);
+      cafeGroup.add(leg);
+
+      // 2 chairs per table, facing each other
+      [[-0.8, 0], [0.8, 0]].forEach(([dx, dz]) => {
+        // Seat
+        const seat = new THREE.Mesh(chairSeatGeo, chairMat);
+        seat.position.set(tx + dx, 0.48, tz + dz);
+        cafeGroup.add(seat);
+        // Back
+        const back = new THREE.Mesh(chairBackGeo, chairMat);
+        back.position.set(tx + dx + (dx > 0 ? 0.22 : -0.22), 0.7, tz + dz);
+        cafeGroup.add(back);
+        // 4 legs
+        [[-0.18, -0.18], [0.18, -0.18], [-0.18, 0.18], [0.18, 0.18]].forEach(([lx, lz]) => {
+          const cLeg = new THREE.Mesh(chairLegGeo, chairMat);
+          cLeg.position.set(tx + dx + lx, 0.23, tz + dz + lz);
+          cafeGroup.add(cLeg);
+        });
+      });
+    }
+
+    // 4 tables spread across the patio
+    addCafeTable(-3, -7);
+    addCafeTable(0, -9);
+    addCafeTable(3, -7);
+    addCafeTable(0, -5.5);
+
+    scene.add(cafeGroup);
+
+    // Second smaller shop (next to cafe)
+    const shopMat = new THREE.MeshLambertMaterial({ map: shopTex });
+    const shop2 = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 5), shopMat);
+    shop2.position.set(CAFE_X + 10, 1.5, CAFE_Z + 5);
+    scene.add(shop2);
+    const roof2 = new THREE.Mesh(new THREE.BoxGeometry(7, 0.2, 6), roofMat);
+    roof2.position.set(CAFE_X + 10, 3.1, CAFE_Z + 5);
+    scene.add(roof2);
+
+    // Warm lights from coffee shop
+    const shopGlow1 = new THREE.PointLight(0xffa040, 1.2, 25, 2);
+    shopGlow1.position.set(CAFE_X, 2.5, CAFE_Z - 5);
+    scene.add(shopGlow1);
+    const shopGlow2 = new THREE.PointLight(0xffb050, 0.6, 15, 2);
+    shopGlow2.position.set(CAFE_X, 1.5, CAFE_Z);
+    scene.add(shopGlow2);
+    const signLight = new THREE.PointLight(0xffcc60, 0.8, 12, 2);
+    signLight.position.set(CAFE_X, 5.5, CAFE_Z - 5);
+    scene.add(signLight);
+
+    // ══════════════════════════════════════════════════════════════
+    // AIRPORT BUILDINGS (distant, across runway)
+    // ══════════════════════════════════════════════════════════════
+    const termMat = new THREE.MeshLambertMaterial({ color: 0x3a3530 });
+
+    // Terminal building
+    const terminal = new THREE.Mesh(new THREE.BoxGeometry(50, 8, 15), termMat);
+    terminal.position.set(-30, 4, -80);
+    scene.add(terminal);
+
+    // Control tower
+    const towerBase = new THREE.Mesh(new THREE.CylinderGeometry(2, 2.5, 18, 8), termMat);
+    towerBase.position.set(20, 9, -90);
+    scene.add(towerBase);
+    const towerCab = new THREE.Mesh(new THREE.BoxGeometry(5, 3, 5),
+      new THREE.MeshLambertMaterial({ color: 0x456070, emissive: 0x203040, emissiveIntensity: 0.3 }));
+    towerCab.position.set(20, 19.5, -90);
+    scene.add(towerCab);
+    const towerRoof = new THREE.Mesh(new THREE.ConeGeometry(4, 1.5, 8),
+      new THREE.MeshLambertMaterial({ color: 0x2a2a2a }));
+    towerRoof.position.set(20, 21.5, -90);
+    scene.add(towerRoof);
+
+    // Smaller hangar
+    const hangar = new THREE.Mesh(new THREE.BoxGeometry(25, 10, 20), termMat);
+    hangar.position.set(-70, 5, -70);
+    scene.add(hangar);
+
+    // ══════════════════════════════════════════════════════════════
+    // AIRPORT FENCE (chain-link, distant)
+    // ══════════════════════════════════════════════════════════════
+    const fenceMat = new THREE.MeshLambertMaterial({ color: 0x555555, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+    const fence = new THREE.Mesh(new THREE.PlaneGeometry(200, 3), fenceMat);
+    fence.position.set(-20, 1.5, -40);
+    scene.add(fence);
+
+    // Fence posts
+    const fencePostMat = new THREE.MeshLambertMaterial({ color: 0x444444 });
+    for (let i = 0; i < 20; i++) {
+      const fp = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 3.5, 4), fencePostMat);
+      fp.position.set(-120 + i * 12, 1.75, -40);
+      scene.add(fp);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // BILLBOARD — "KRISHUUU LOVES HIS SANDHYAAA"
+    // ══════════════════════════════════════════════════════════════
+    const BB_X = 32, BB_Z = -38, BB_Y = 0;
+    const BB_W = 12, BB_H = 5.5;
+    const BB_POLE_H = 7.5;
+    const BB_TOP = BB_Y + BB_POLE_H + BB_H / 2; // center of board face
+
+    // Poles
+    const bbPoleMat = new THREE.MeshLambertMaterial({ color: 0x2a2520 });
+    const bbPoleGeo = new THREE.CylinderGeometry(0.18, 0.22, BB_POLE_H, 8);
+    const pole1 = new THREE.Mesh(bbPoleGeo, bbPoleMat);
+    pole1.position.set(BB_X - 3.5, BB_Y + BB_POLE_H / 2, BB_Z);
+    scene.add(pole1);
+    const pole2 = new THREE.Mesh(bbPoleGeo, bbPoleMat);
+    pole2.position.set(BB_X + 3.5, BB_Y + BB_POLE_H / 2, BB_Z);
+    scene.add(pole2);
+
+    // Horizontal support beam at top of poles
+    const bbBeam = new THREE.Mesh(new THREE.BoxGeometry(BB_W + 1.5, 0.25, 0.25), bbPoleMat);
+    bbBeam.position.set(BB_X, BB_Y + BB_POLE_H, BB_Z);
+    scene.add(bbBeam);
+
+    // Billboard frame (dark border)
+    const bbFrameMat = new THREE.MeshLambertMaterial({ color: 0x1a1210 });
+    const bbFrame = new THREE.Mesh(new THREE.BoxGeometry(BB_W + 0.5, BB_H + 0.5, 0.18), bbFrameMat);
+    bbFrame.position.set(BB_X, BB_TOP, BB_Z);
+    scene.add(bbFrame);
+
+    // Billboard face canvas texture
+    const bbCanvas = document.createElement('canvas');
+    bbCanvas.width = 1024;
+    bbCanvas.height = 448;
+    const bbCtx = bbCanvas.getContext('2d');
+
+    // Red background
+    bbCtx.fillStyle = '#cc0000';
+    bbCtx.fillRect(0, 0, 1024, 448);
+
+    // Subtle vignette
+    const vign = bbCtx.createRadialGradient(512, 224, 60, 512, 224, 520);
+    vign.addColorStop(0, 'rgba(0,0,0,0)');
+    vign.addColorStop(1, 'rgba(0,0,0,0.35)');
+    bbCtx.fillStyle = vign;
+    bbCtx.fillRect(0, 0, 1024, 448);
+
+    // Glow layers for white text
+    bbCtx.textAlign = 'center';
+    bbCtx.textBaseline = 'middle';
+
+    // Outer glow (white, blurred visually via large shadow)
+    bbCtx.shadowColor = '#ffffff';
+    bbCtx.shadowBlur = 48;
+    bbCtx.fillStyle = 'rgba(255,255,255,0.18)';
+    bbCtx.font = 'bold 72px Arial, Helvetica, sans-serif';
+    bbCtx.fillText('KRISHUUU LOVES', 512, 150);
+    bbCtx.fillText('HIS SANDHYAAA', 512, 300);
+
+    // Mid glow
+    bbCtx.shadowBlur = 24;
+    bbCtx.fillStyle = 'rgba(255,255,255,0.55)';
+    bbCtx.fillText('KRISHUUU LOVES', 512, 150);
+    bbCtx.fillText('HIS SANDHYAAA', 512, 300);
+
+    // Crisp bright text on top
+    bbCtx.shadowBlur = 8;
+    bbCtx.fillStyle = '#ffffff';
+    bbCtx.fillText('KRISHUUU LOVES', 512, 150);
+    bbCtx.fillText('HIS SANDHYAAA', 512, 300);
+
+    const bbTex = new THREE.CanvasTexture(bbCanvas);
+    const bbFaceMat = new THREE.MeshLambertMaterial({
+      map: bbTex,
+      emissive: 0xff3333,
+      emissiveIntensity: 0.45,
+      emissiveMap: bbTex
+    });
+
+    const bbFace = new THREE.Mesh(new THREE.BoxGeometry(BB_W, BB_H, 0.12), bbFaceMat);
+    bbFace.position.set(BB_X, BB_TOP, BB_Z + 0.04);
+    scene.add(bbFace);
+
+    // Subtle point light to cast billboard glow onto surroundings
+    const bbGlow = new THREE.PointLight(0xff4444, 0.7, 20, 2);
+    bbGlow.position.set(BB_X, BB_TOP, BB_Z + 3);
+    scene.add(bbGlow);
+
+    // ══════════════════════════════════════════════════════════════
+    // TREES — silhouettes against sunset
+    // ══════════════════════════════════════════════════════════════
+    const trunkMat = new THREE.MeshLambertMaterial({ color: 0x1a0e06 });
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x0a1a08 });
+
+    function addTree(x, z, sc) {
+      const th = (4 + Math.random() * 3) * sc;
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15 * sc, 0.25 * sc, th, 5), trunkMat);
+      trunk.position.set(x, th / 2, z);
+      scene.add(trunk);
+      for (let i = 0; i < 3; i++) {
+        const r = (2 + Math.random() * 1.5) * sc;
+        const leaf = new THREE.Mesh(new THREE.SphereGeometry(r, 6, 4), leafMat);
+        leaf.position.set(
+          x + (Math.random() - 0.5) * 2.5 * sc,
+          th + Math.random() * 1.5 * sc,
+          z + (Math.random() - 0.5) * 2.5 * sc
+        );
+        scene.add(leaf);
+      }
+    }
+
+    // Trees along the road
+    for (let i = 0; i < 8; i++) addTree(32 + Math.random() * 4, -100 + i * 18, 0.8 + Math.random() * 0.4);
+    // Trees on the far side
+    for (let i = 0; i < 6; i++) addTree(-60 + i * 15, -35 + Math.random() * 5, 0.9 + Math.random() * 0.3);
+    // Some trees near the platform
+    addTree(-16, 12, 1.1);
+    addTree(18, 15, 0.9);
+    addTree(-18, -5, 1.0);
+
+    // ══════════════════════════════════════════════════════════════
+    // PARKING LOT AND VEHICLES (in the distance)
+    // ══════════════════════════════════════════════════════════════
+    const parkingLotMat = new THREE.MeshLambertMaterial({ map: asphaltTex });
+    const parkingLot = new THREE.Mesh(new THREE.PlaneGeometry(100, 150).rotateX(-Math.PI / 2), parkingLotMat);
+    parkingLot.position.set(50, 0.05, -100);
+    scene.add(parkingLot);
+
+    const carColors = [0x2a2028, 0x6a2525, 0x253a6a, 0x4a4a4a, 0x1a1a1a, 0x7a7065];
+    for (let row = 0; row < 18; row++) {
+      for (let col = 0; col < 12; col++) {
+        if (Math.random() > 0.85) continue; // leave some empty parking spots
+
+        const cx = 15 + col * 6 + (Math.random() - 0.5) * 0.5;
+        const cz = -35 - row * 8 + (Math.random() - 0.5) * 0.5;
+
+        const cColor = carColors[Math.floor(Math.random() * carColors.length)];
+        const bMat = new THREE.MeshLambertMaterial({ color: cColor });
+        const car = new THREE.Mesh(new THREE.BoxGeometry(2, 1.4, 4), bMat);
+        car.position.set(cx, 0.7, cz);
+
+        const tMat = new THREE.MeshLambertMaterial({ color: 0x1a1a1a }); // dark roof for all
+        const top = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.6, 2.5), tMat);
+        top.position.set(cx, 1.6, cz);
+
+        const rot = (Math.random() - 0.5) * 0.1;
+        car.rotation.y = rot;
+        top.rotation.y = rot;
+
+        scene.add(car);
+        scene.add(top);
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // CLOUDS — fluffy spheres, lit by golden sun
+    // ══════════════════════════════════════════════════════════════
+    const cloudSphere = new THREE.SphereGeometry(1, 7, 5);
+    const cloudMat = new THREE.MeshBasicMaterial({
+      color: 0xffdca0, transparent: true, opacity: 0.4,
+      depthWrite: false, fog: true
+    });
+    const cloudMatDark = new THREE.MeshBasicMaterial({
+      color: 0xeec080, transparent: true, opacity: 0.3,
+      depthWrite: false, fog: true
+    });
+
+    const cloudPositions = [
+      [40, 50, -120, 16, 7],
+      [-60, 55, -100, 20, 8],
+      [80, 48, -80, 14, 6],
+      [-30, 52, -140, 18, 7],
+      [10, 58, -160, 22, 8],
+      [-80, 50, -60, 15, 6],
+      [60, 53, -50, 12, 5],
+      [-10, 60, -200, 20, 7],
+      [100, 47, -130, 16, 6],
+      [-50, 54, -170, 18, 7],
+    ];
+    cloudPositions.forEach(([cx, cy, cz, spread, puffs]) => {
+      for (let j = 0; j < puffs; j++) {
+        const mat = Math.random() > 0.4 ? cloudMat : cloudMatDark;
+        const puff = new THREE.Mesh(cloudSphere, mat);
+        const angle = (j / puffs) * Math.PI * 2 + Math.random() * 0.8;
+        const dist = Math.random() * spread * 0.5;
+        puff.position.set(
+          cx + Math.cos(angle) * dist,
+          cy + (Math.random() - 0.5) * 3,
+          cz + Math.sin(angle) * dist
+        );
+        const size = 4 + Math.random() * 6;
+        puff.scale.set(size * (1 + Math.random() * 0.5), size * 0.35, size * (0.8 + Math.random() * 0.4));
+        scene.add(puff);
+      }
+    });
+
+    // ══════════════════════════════════════════════════════════════
+    // BENCHES (Removed to make room)
+    // ══════════════════════════════════════════════════════════════
+
+    // ══════════════════════════════════════════════════════════════
+    // UTILITY POLES along road
+    // ══════════════════════════════════════════════════════════════
+    const poleMat = new THREE.MeshLambertMaterial({ color: 0x3a3530 });
+    for (let i = 0; i < 6; i++) {
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 9, 5), poleMat);
+      pole.position.set(21, 4.5, -80 + i * 25);
+      scene.add(pole);
+      // Cross arm
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(3, 0.1, 0.1), poleMat);
+      arm.position.set(21, 8.5, -80 + i * 25);
+      scene.add(arm);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // COLLISION
+    // ══════════════════════════════════════════════════════════════
+    function valid(p) {
+      // World boundary
+      if (Math.abs(p.x) > 80 || Math.abs(p.z) > 80) return false;
+      // Must stay on the elevated platform area
+      // Main platform: x ∈ [-10, 10], z ∈ [-8, 8]
+      if (p.x > -10.5 && p.x < 10.5 && p.z > -8.5 && p.z < 8.5) return true;
+      // Walkway: x ∈ [-15, 15], z ∈ [8, 12]
+      if (p.x > -15.5 && p.x < 15.5 && p.z > 7.5 && p.z < 12.5) return true;
+      // Steps area: x ∈ [10, 14], z ∈ [10, 25] (going down)
+      if (p.x > 9.5 && p.x < 14.5 && p.z > 9.5 && p.z < 25) return true;
+      // Ground level: free roam
+      if (p.y < GY - 1) return true;
+      return false;
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ANIMATION
+    // ══════════════════════════════════════════════════════════════
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.05);
+
+      if (controls.isLocked) {
+        const prev = camera.position.clone();
+        const s = SPD * dt;
+        if (keys.KeyW) controls.moveForward(s);
+        if (keys.KeyS) controls.moveForward(-s);
+        if (keys.KeyD) controls.moveRight(s);
+        if (keys.KeyA) controls.moveRight(-s);
+
+        // Determine correct height based on position
+        if (camera.position.x > 9.5 && camera.position.z > 9.5) {
+          // On steps — gradual descent
+          const stepProgress = Math.max(0, (camera.position.z - 10) / 12);
+          const stepH = GY + 1.75 - stepProgress * GY;
+          camera.position.y = Math.max(1.75, stepH);
+        } else if (camera.position.x > -10.5 && camera.position.x < 10.5 &&
+          camera.position.z > -8.5 && camera.position.z < 12.5) {
+          camera.position.y = PH; // On platform
+        } else {
+          camera.position.y = 1.75; // Ground level
+        }
+
+        if (!valid(camera.position)) camera.position.copy(prev);
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
+  </script>
+</body>
+
+</html>
